@@ -1,6 +1,7 @@
 package main
 
 import (
+	"MIET-TelegramBot/internal/app/recipientdata"
 	"MIET-TelegramBot/internal/app/telegramserver"
 	"flag"
 	"github.com/BurntSushi/toml"
@@ -23,6 +24,8 @@ func main() {
 		log.Panic(err)
 	}
 
+	recipientdata.MakeRequest()
+
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
 		log.Panic(err)
@@ -39,9 +42,15 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil { // If we got a message
+			var msg tgbotapi.MessageConfig
 			log.Printf("[%s] %s %s", update.Message.Command(), update.Message.From.UserName, update.Message.Text)
 
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+			if update.Message.IsCommand() {
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Its a command")
+			} else {
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+			}
+
 			msg.ReplyToMessageID = update.Message.MessageID
 
 			bot.Send(msg)
