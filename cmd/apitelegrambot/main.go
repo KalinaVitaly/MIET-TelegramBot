@@ -1,12 +1,12 @@
 package main
 
 import (
-	"MIET-TelegramBot/internal/app/recipientdata"
 	"MIET-TelegramBot/internal/app/telegramserver"
 	"flag"
+	"log"
+
 	"github.com/BurntSushi/toml"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
 )
 
 var (
@@ -24,7 +24,52 @@ func main() {
 		log.Panic(err)
 	}
 
-	recipientdata.MakeRequest()
+	// var mapNames map[string]string = make(map[string]string)
+
+	// mapNames["БТС"] = "BTS"
+	// mapNames["Д"] = "D"
+	// mapNames["ИВТ"] = "IVT"
+	// mapNames["ИKT"] = "IKT"
+	// mapNames["ИТD"] = "ITD"
+	// mapNames["КТ"] = "KT"
+	// mapNames["Л"] = "L"
+	// mapNames["М"] = "M"
+	// mapNames["МТ"] = "MT"
+	// mapNames["НБ"] = "NB"
+	// mapNames["НМ"] = "NM"
+	// mapNames["П"] = "P"
+	// mapNames["PИН"] = "PIN"
+	// mapNames["РТ"] = "RT"
+	// mapNames["ТБ"] = "TB"
+	// mapNames["УК"] = "UK"
+	// mapNames["УТС"] = "UTS"
+	// mapNames["ЭН"] = "EN"
+	// mapNames["ИБ"] = "IB"
+	// files, err := ioutil.ReadDir("./resources/")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// for _, file := range files {
+	// 	for key, value := range mapNames {
+	// 		if strings.Contains(file.Name(), key) {
+	// 			fileName := file.Name()
+	// 			fileName = strings.Replace(fileName, key, value, -1)
+	// 			fmt.Println("Result", file.Name(), fileName, "/resources/"+file.Name())
+	// 			os.Chmod("./resources/"+file.Name(), 0777)
+	// 			os.Rename("./resources/"+file.Name(), "./resources/"+fileName)
+	// 		}
+	// 	}
+	// }
+	// schedule, err := datareader.ReadDataFromFile("resources\\BTS-11.json")
+
+	// if err != nil {
+	// 	fmt.Println("Error read schedule")
+	// }
+
+	// for i := range schedule.Data {
+	// 	fmt.Println(schedule.Data[i].Class)
+	// }
 
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
@@ -42,18 +87,13 @@ func main() {
 
 	for update := range updates {
 		if update.Message != nil { // If we got a message
-			var msg tgbotapi.MessageConfig
-			log.Printf("[%s] %s %s", update.Message.Command(), update.Message.From.UserName, update.Message.Text)
+			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			if update.Message.IsCommand() {
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Its a command")
-			} else {
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			}
-
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
 			bot.Send(msg)
 		}
 	}
+
 }
