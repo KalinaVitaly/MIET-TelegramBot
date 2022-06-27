@@ -38,6 +38,15 @@ func (b *TelegramBot) StartTelegramBotServer() {
 		if update.Message != nil { // If we got a message
 			fmt.Println("[%s] %s", update.Message.From.UserName, update.Message.Text)
 			fmt.Println("My output : ", update.Message.IsCommand())
+
+			if update.Message.IsCommand() {
+				fmt.Println("This is command : ", update.Message.Command(), update.Message.From.UserName)
+				CreateNewCommand(update.Message.Command(), update.Message.From.UserName)
+			} else {
+				fmt.Println("This is message : ", update.Message.Text, update.Message.From.UserName)
+				CreateNewMessage(update.Message.Text, update.Message.From.UserName)
+			}
+
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			msg.ReplyToMessageID = update.Message.MessageID
 
