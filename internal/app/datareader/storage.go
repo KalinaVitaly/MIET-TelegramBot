@@ -5,14 +5,16 @@ import (
 	"fmt"
 )
 
+type TimeClass struct {
+	Time     string `json:"Time"`
+	Code     int    `json:"Code"`
+	TimeFrom string `json:"TimeFrom"`
+	TimeTo   string `json:"TimeTo"`
+}
+
 type GroupSchedule struct {
-	Times []struct {
-		Time     string `json:"Time"`
-		Code     int    `json:"Code"`
-		TimeFrom string `json:"TimeFrom"`
-		TimeTo   string `json:"TimeTo"`
-	} `json:"Times"`
-	Data []struct {
+	Times []TimeClass `json:"Times"`
+	Data  []struct {
 		Day       int `json:"Day"`
 		DayNumber int `json:"DayNumber"`
 		Time      struct {
