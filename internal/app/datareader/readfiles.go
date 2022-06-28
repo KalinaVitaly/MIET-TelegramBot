@@ -19,3 +19,19 @@ func ReadDataFromFile(filePath string) (*GroupSchedule, error) {
 
 	return result, err
 }
+
+func GetFileNameFromDir(dirPath string) ([]string, error) {
+	var fileList []string
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return fileList, err
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			fileList = append(fileList, file.Name())
+		}
+	}
+
+	return fileList, nil
+}
