@@ -24,9 +24,7 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 	if len(groupSchdule) <= 0 {
 		return nil, errors.New("Error: read GroupSchedule failed!")
 	}
-	//schedule.Data[0].Group.Name
 
-	//Get schedule time lessons
 	for i := range groupSchdule[0].Times {
 		classTime[int8(i)] = groupSchdule[0].Times[i]
 	}
@@ -39,4 +37,12 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 		ClassTime:      classTime,
 		GroupsSchedule: groupScheduleMap,
 	}, nil
+}
+
+func (scheduleGroups *ScheduleUniversity) GetClassTime() (result string) {
+	for _, value := range scheduleGroups.ClassTime {
+		result += value.Time + " Начало : " + value.TimeFrom + " Конец : " + value.TimeTo + "\n"
+	}
+
+	return result
 }
