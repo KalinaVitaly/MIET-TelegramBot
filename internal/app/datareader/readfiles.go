@@ -1,8 +1,31 @@
 package datareader
 
 import (
+	"fmt"
 	"io/ioutil"
 )
+
+func ReadFilesFromDir(dirPath string) ([]*GroupSchedule, error) {
+	var groupScheduleList []*GroupSchedule
+	filespathes, err := getFileNameFromDir(dirPath)
+	if err != nil {
+		fmt.Println("Error : read file names from dir failed!")
+		return groupScheduleList, err
+	}
+
+	for _, value := range filespathes {
+		schedule, err := ReadDataFromFile(dirPath + value)
+
+		if err != nil {
+			fmt.Println("Error : read data from file failed!")
+			return groupScheduleList, err
+		}
+
+		groupScheduleList = append(groupScheduleList, schedule)
+	}
+
+	return groupScheduleList, nil
+}
 
 func ReadDataFromFile(filePath string) (*GroupSchedule, error) {
 	fileData, err := ioutil.ReadFile(filePath)
@@ -20,7 +43,7 @@ func ReadDataFromFile(filePath string) (*GroupSchedule, error) {
 	return result, err
 }
 
-func GetFileNameFromDir(dirPath string) ([]string, error) {
+func getFileNameFromDir(dirPath string) ([]string, error) {
 	var fileList []string
 	files, err := ioutil.ReadDir(dirPath)
 	if err != nil {

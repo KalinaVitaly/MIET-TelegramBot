@@ -7,13 +7,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/BurntSushi/toml"
 )
 
 var (
-	configsPath   string
-	resourcesPath string
+	configsPath string
 )
 
 func init() {
@@ -27,34 +27,13 @@ func main() {
 		log.Panic(err)
 	}
 
-	// scheduleData, err := datareader.GetFileNameFromDir(config.ResourcesPath)
-
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-
-	schedule, err := datareader.ReadDataFromFile("./resources/PIN-44.json")
+	scheduleUniversity, err := datareader.CreateScheduleUniversity(config.ResourcesPath)
 
 	if err != nil {
-		log.Panic(err)
+		os.Exit(1)
 	}
 
-	fmt.Println("Data : ")
-
-	for key, value := range schedule.Data {
-		fmt.Println(key, value)
-	}
-
-	fmt.Println("Semestr : ")
-	for key, value := range schedule.Semestr {
-		fmt.Println(key, value)
-	}
-
-	fmt.Println("Times : ")
-	for key, value := range schedule.Times {
-		fmt.Println(key, value)
-	}
-	//fmt.Println("Data read :", schedule.Data[0].Group.Name)
+	fmt.Println("Result : ", scheduleUniversity.GroupsSchedule["ПИН-44"])
 
 	bot, err := telegrambotapi.CreateTelegramBot(config.Token)
 

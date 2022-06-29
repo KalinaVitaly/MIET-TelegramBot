@@ -1,6 +1,8 @@
 package datareader
 
-import "errors"
+import (
+	"errors"
+)
 
 type ScheduleUniversity struct {
 	GroupsSchedule map[string]*GroupSchedule
@@ -8,26 +10,33 @@ type ScheduleUniversity struct {
 	CurrentWeek    int8
 }
 
-func CreateScheduleUniversity(data []*GroupSchedule) (*ScheduleUniversity, error) {
-	classTime := make(map[int8]TimeClass, 7)
-	groupSchedule := make(map[string]*GroupSchedule)
+func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 
-	if len(data) <= 0 {
+	groupSchdule, err := ReadFilesFromDir(dirPath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	classTime := make(map[int8]TimeClass, 7)
+	groupScheduleMap := make(map[string]*GroupSchedule)
+
+	if len(groupSchdule) <= 0 {
 		return nil, errors.New("Error: read GroupSchedule failed!")
 	}
 	//schedule.Data[0].Group.Name
 
 	//Get schedule time lessons
-	for i := range data[0].Times {
-		classTime[int8(i)] = data[0].Times[i]
+	for i := range groupSchdule[0].Times {
+		classTime[int8(i)] = groupSchdule[0].Times[i]
 	}
 
-	for i := range data {
-		groupSchedule[data[i].Data[0].Group.Name] = data[i]
+	for i := range groupSchdule {
+		groupScheduleMap[groupSchdule[i].Data[0].Group.Name] = groupSchdule[i]
 	}
 
 	return &ScheduleUniversity{
 		ClassTime:      classTime,
-		GroupsSchedule: groupSchedule,
+		GroupsSchedule: groupScheduleMap,
 	}, nil
 }
