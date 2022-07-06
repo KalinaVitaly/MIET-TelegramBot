@@ -27,13 +27,14 @@ func main() {
 		log.Panic(err)
 	}
 
-	scheduleUniversity, err := datareader.CreateScheduleUniversity(config.ResourcesPath)
+	err := datareader.CreateScheduleUniversity(config.ResourcesPath)
 
 	if err != nil {
 		os.Exit(1)
 	}
 
-	fmt.Println("Result : ", scheduleUniversity.GroupsSchedule["ПИН-44"])
+	// fmt.Println("Result : ", scheduleUniversity.GroupsSchedule["ПИН-44"])
+	// fmt.Println("Schedule classes : ", scheduleUniversity.GetClassTime())
 
 	bot, err := telegrambotapi.CreateTelegramBot(config.Token)
 
