@@ -58,6 +58,7 @@ func (cb *CommandBot) commandIdentification() string {
 	case "subscribe":
 	case "desubscibe":
 	case "help":
+		return datareader.GetHelpMessage()
 	case "class_time":
 		responceClassTime := datareader.GetInstanceScheduleUniversity()
 		return responceClassTime.ClassTimeToString()
