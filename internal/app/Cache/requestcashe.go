@@ -40,5 +40,8 @@ func (data *CacheData) AddDataInCache(request, value, response string) {
 	defer data.CacheMutex.Unlock()
 
 	data.AvailableData[request+"/"+value] = createdResponceCache
+}
+
+func (data *CacheData) ClearOldCacheData() {
 
 }
