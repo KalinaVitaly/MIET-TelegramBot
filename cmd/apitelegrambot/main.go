@@ -24,9 +24,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// fmt.Println("Result : ", scheduleUniversity.GroupsSchedule["ПИН-44"])
-	// fmt.Println("Schedule classes : ", scheduleUniversity.GetClassTime())
-
 	bot, err := telegrambotapi.CreateTelegramBot(config.Token, config.ResourcesPath)
 
 	if err != nil {

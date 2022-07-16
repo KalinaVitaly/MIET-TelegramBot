@@ -49,8 +49,6 @@ func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 	default:
 		return b.handleDefaultCommand(message)
 	}
-
-	return nil
 }
 
 func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
@@ -129,7 +127,8 @@ func (b *TelegramBot) handleDesubscribeCommand(message *tgbotapi.Message) error 
 }
 
 func (b *TelegramBot) handleHelpCommand(message *tgbotapi.Message) error {
-	if _, err := b.BotAPI.Send(datareader.GetHelpMessage()); err != nil {
+	msg := tgbotapi.NewMessage(message.Chat.ID, datareader.GetHelpMessage())
+	if _, err := b.BotAPI.Send(msg); err != nil {
 		log.Println("Error: ", err.Error())
 		return err
 	}
@@ -137,12 +136,16 @@ func (b *TelegramBot) handleHelpCommand(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleClassTimeCommand(message *tgbotapi.Message) error {
-
+	msg := tgbotapi.NewMessage(message.Chat.ID, b.UniversityData.ClassTimeToString())
+	if _, err := b.BotAPI.Send(msg); err != nil {
+		log.Println("Error: ", err.Error())
+	}
 	return nil
 }
 
 func (b *TelegramBot) handleDefaultCommand(message *tgbotapi.Message) error {
-	if _, err := b.BotAPI.Send(fmt.Sprintf("Неизвестная комманда %s", message.Command())); err != nil {
+	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("Неизвестная комманда %s", message.Command()))
+	if _, err := b.BotAPI.Send(msg); err != nil {
 		log.Println("Error: ", err.Error())
 		return err
 	}

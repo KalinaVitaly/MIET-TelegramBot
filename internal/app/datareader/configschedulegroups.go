@@ -11,8 +11,6 @@ type ScheduleUniversity struct {
 	CurrentWeek    int8
 }
 
-var scheduleUniversity *ScheduleUniversity
-
 func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 
 	groupSchdule, err := ReadFilesFromDir(dirPath)
@@ -51,4 +49,8 @@ func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {
 	result = strings.Replace(result, "0001-01-01T", "", -1)
 
 	return result
+}
+
+func (scheduleGroups *ScheduleUniversity) GetTimeClass() map[int8]TimeClass {
+	return scheduleGroups.ClassTime
 }
