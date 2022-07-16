@@ -13,19 +13,19 @@ type ScheduleUniversity struct {
 
 var scheduleUniversity *ScheduleUniversity
 
-func CreateScheduleUniversity(dirPath string) error {
+func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 
 	groupSchdule, err := ReadFilesFromDir(dirPath)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	classTime := make(map[int8]TimeClass, 7)
 	groupScheduleMap := make(map[string]*GroupSchedule)
 
 	if len(groupSchdule) <= 0 {
-		return errors.New("Error: read GroupSchedule failed!")
+		return nil, errors.New("Error: read GroupSchedule failed!")
 	}
 
 	for i := range groupSchdule[0].Times {
@@ -36,11 +36,11 @@ func CreateScheduleUniversity(dirPath string) error {
 		groupScheduleMap[groupSchdule[i].Data[0].Group.Name] = groupSchdule[i]
 	}
 
-	scheduleUniversity = &ScheduleUniversity{
-		ClassTime:      classTime,
-		GroupsSchedule: groupScheduleMap,
-	}
-	return nil
+	return &ScheduleUniversity{
+			ClassTime:      classTime,
+			GroupsSchedule: groupScheduleMap,
+		},
+		nil
 }
 
 func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {
@@ -51,8 +51,4 @@ func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {
 	result = strings.Replace(result, "0001-01-01T", "", -1)
 
 	return result
-}
-
-func GetInstanceScheduleUniversity() *ScheduleUniversity {
-	return scheduleUniversity
 }

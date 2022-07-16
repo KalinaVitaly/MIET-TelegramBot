@@ -1,6 +1,7 @@
 package telegrambotapi
 
 import (
+	"MIET-TelegramBot/internal/app/datareader"
 	"fmt"
 	"log"
 
@@ -8,57 +9,44 @@ import (
 )
 
 func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
-	// 	now - Пара сейчас
-	// today - Расписание на сегодня
-	// tomorrow - Расписание на завтра
-	// teacher_all - Поиск преподавателя
-	// weekschedule - Расписание на неделю
-	// weekschedule_short - Краткое расписание
-	// week - Текущая неделя
-	// group - Показать группу
-	// auth - Авторизация
-	// auth_teacher - Авторизация для преподавателя
-	// deauth - Деавторизация
-	// deauth_teacher - Деавторизация для преподавателя
-	// subscription - Статус подписки
-	// subscribe - Подписаться на уведомления
-	// desubscibe - Отписаться от уведомлений
-	// help - Помощь
-
+	log.Println(fmt.Sprintf("Комманда %s от пользователя %s", message.Command(), message.From.UserName))
 	switch message.Command() {
 
 	case "now":
-
+		return b.handleNowCommand(message)
 	case "today":
-
+		return b.handleTodayCommand(message)
 	case "tomorrow":
-
+		return b.handleTomorrowCommand(message)
 	case "teacher_all":
-
+		return b.handleTeacherAllCommand(message)
 	case "weekschedule":
-
+		return b.handleWeekScheduleCommand(message)
 	case "weekschedule_short":
-
+		return b.handleWeekScheduleShortCommand(message)
 	case "week":
-
+		return b.handleWeekCommand(message)
 	case "group":
-
+		return b.handleGroupCommand(message)
 	case "auth":
-
+		return b.handleAuthCommand(message)
 	case "auth_teacher":
+		return b.handleAuthTeacherCommand(message)
 	case "deauth":
+		return b.handleDeauthCommand(message)
 	case "deauth_teacher":
+		return b.handleDeauthTeacherCommand(message)
 	case "subscription":
+		return b.handleSubscribtionCommand(message)
 	case "subscribe":
+		return b.handleSubscribeCommand(message)
 	case "desubscibe":
-	// case "help":
-	// 	return datareader.GetHelpMessage()
-	// case "class_time":
-	// 	responceClassTime := datareader.GetInstanceScheduleUniversity()
-	// 	return responceClassTime.ClassTimeToString()
-	// }
+		return b.handleDesubscribeCommand(message)
+	case "help":
+		return b.handleHelpCommand(message)
+	case "class_time":
+		return b.handleClassTimeCommand(message)
 	default:
-		log.Println(fmt.Sprintf("Неизвестная комманда %s", message.Command()))
 		return b.handleDefaultCommand(message)
 	}
 
@@ -141,7 +129,10 @@ func (b *TelegramBot) handleDesubscribeCommand(message *tgbotapi.Message) error 
 }
 
 func (b *TelegramBot) handleHelpCommand(message *tgbotapi.Message) error {
-
+	if _, err := b.BotAPI.Send(datareader.GetHelpMessage()); err != nil {
+		log.Println("Error: ", err.Error())
+		return err
+	}
 	return nil
 }
 
@@ -152,6 +143,7 @@ func (b *TelegramBot) handleClassTimeCommand(message *tgbotapi.Message) error {
 
 func (b *TelegramBot) handleDefaultCommand(message *tgbotapi.Message) error {
 	if _, err := b.BotAPI.Send(fmt.Sprintf("Неизвестная комманда %s", message.Command())); err != nil {
+		log.Println("Error: ", err.Error())
 		return err
 	}
 

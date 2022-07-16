@@ -1,7 +1,9 @@
 package telegrambotapi
 
 import (
+	"MIET-TelegramBot/internal/app/datareader"
 	"fmt"
+	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -9,15 +11,27 @@ import (
 type TelegramBot struct {
 	BotAPI         *tgbotapi.BotAPI
 	UpdatesChannel tgbotapi.UpdatesChannel
+	UniversityData *datareader.ScheduleUniversity
 }
 
-func CreateTelegramBot(token string) (*TelegramBot, error) {
+func CreateTelegramBot(token string, resourcesPath string) (*TelegramBot, error) {
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
+		log.Println("Error get bot ", err.Error())
 		return nil, err
 	}
 
-	return &TelegramBot{BotAPI: bot}, nil
+	universityData, err := datareader.CreateScheduleUniversity(resourcesPath)
+
+	if err != nil {
+		log.Println("Error read resources files ", err.Error())
+		return nil, err
+	}
+
+	return &TelegramBot{
+		BotAPI:         bot,
+		UniversityData: universityData,
+	}, nil
 }
 
 func (b *TelegramBot) ConfigTelegramBot() {

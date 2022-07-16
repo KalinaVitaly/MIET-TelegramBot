@@ -1,13 +1,10 @@
 package main
 
 import (
-	"MIET-TelegramBot/internal/app/datareader"
-	telegrambotapi "MIET-TelegramBot/internal/app/handlers"
+	telegrambotapi "MIET-TelegramBot/internal/app/telegram"
 	"MIET-TelegramBot/internal/app/telegramserver"
 	"flag"
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/BurntSushi/toml"
 )
@@ -24,22 +21,16 @@ func main() {
 	flag.Parse()
 	config := telegramserver.NewConfig()
 	if _, err := toml.DecodeFile(configsPath, config); err != nil {
-		log.Panic(err)
-	}
-
-	err := datareader.CreateScheduleUniversity(config.ResourcesPath)
-
-	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	// fmt.Println("Result : ", scheduleUniversity.GroupsSchedule["ПИН-44"])
 	// fmt.Println("Schedule classes : ", scheduleUniversity.GetClassTime())
 
-	bot, err := telegrambotapi.CreateTelegramBot(config.Token)
+	bot, err := telegrambotapi.CreateTelegramBot(config.Token, config.ResourcesPath)
 
 	if err != nil {
-		fmt.Println("Create telegram bot failed")
+		log.Fatal("Create telegram bot failed")
 		return
 	}
 
