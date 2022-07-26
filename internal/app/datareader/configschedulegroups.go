@@ -2,7 +2,6 @@ package datareader
 
 import (
 	"errors"
-	"strings"
 )
 
 type ScheduleUniversity struct {
@@ -42,13 +41,14 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 }
 
 func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {
-	for i := 0; i < len(scheduleGroups.ClassTime); i++ {
-		result += scheduleGroups.ClassTime[int8(i)].Time + " Начало : " + scheduleGroups.ClassTime[int8(i)].TimeFrom + " Конец : " + scheduleGroups.ClassTime[int8(i)].TimeTo + "\n"
-	}
+	// for i := 0; i < len(scheduleGroups.ClassTime); i++ {
+	// 	result += scheduleGroups.ClassTime[int8(i)].Time + " Начало : " + scheduleGroups.ClassTime[int8(i)].TimeFrom + " Конец : " + scheduleGroups.ClassTime[int8(i)].TimeTo + "\n"
+	// }
 
-	result = strings.Replace(result, "0001-01-01T", "", -1)
+	// result = strings.Replace(result, "0001-01-01T", "", -1)
 
-	return result
+	// return result
+	return ""
 }
 
 func (scheduleGroups *ScheduleUniversity) GetTimeClass() map[int8]TimeClass {

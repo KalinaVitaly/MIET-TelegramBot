@@ -3,44 +3,58 @@ package datareader
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 )
 
 func ReadFilesFromDir(dirPath string) ([]*GroupSchedule, error) {
 	var groupScheduleList []*GroupSchedule
+	errorChan := make(chan error)
+	resultChan := make(chan *GroupSchedule)
 	filespathes, err := getFileNameFromDir(dirPath)
+
 	if err != nil {
 		fmt.Println("Error : read file names from dir failed!")
 		return groupScheduleList, err
 	}
 
-	for _, value := range filespathes {
-		schedule, err := ReadDataFromFile(dirPath + value)
-
-		if err != nil {
-			fmt.Println("Error : read data from file failed!")
-			return groupScheduleList, err
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Recover after panic ! ", err)
 		}
+	}()
 
-		groupScheduleList = append(groupScheduleList, schedule)
+	for _, value := range filespathes {
+		go readDataFromFile(value, errorChan, resultChan)
 	}
 
-	return groupScheduleList, nil
+	for {
+		select {
+		case err := <-errorChan:
+			log.Println("Error read file :", err)
+		case data := <-resultChan:
+			groupScheduleList = append(groupScheduleList, data)
+
+			if len(groupScheduleList) == len(filespathes) {
+				log.Println("All files read ", len(groupScheduleList), len(filespathes))
+				return groupScheduleList, nil
+			}
+		}
+	}
 }
 
-func ReadDataFromFile(filePath string) (*GroupSchedule, error) {
+func readDataFromFile(filePath string, chError chan<- error, chResult chan<- *GroupSchedule) {
 	fileData, err := ioutil.ReadFile(filePath)
-	// can file be opened?
 	if err != nil {
-		return nil, err
+		chError <- err
 	}
 
 	result, err := NewGroupSchedule(fileData)
 
 	if err != nil {
-		return nil, err
+		chError <- err
 	}
 
-	return result, err
+	chResult <- result
 }
 
 func getFileNameFromDir(dirPath string) ([]string, error) {
@@ -52,7 +66,7 @@ func getFileNameFromDir(dirPath string) ([]string, error) {
 
 	for _, file := range files {
 		if !file.IsDir() {
-			fileList = append(fileList, file.Name())
+			fileList = append(fileList, dirPath+file.Name())
 		}
 	}
 
