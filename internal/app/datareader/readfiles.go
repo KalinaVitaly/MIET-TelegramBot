@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"time"
 )
 
 func ReadFilesFromDir(dirPath string) ([]*GroupSchedule, error) {
@@ -32,6 +33,9 @@ func ReadFilesFromDir(dirPath string) ([]*GroupSchedule, error) {
 
 	for {
 		select {
+		case <-time.After(time.Second * 10):
+			log.Println("Something went wrong...")
+			return nil, fmt.Errorf("Long reading file")
 		case data := <-chanReadFile:
 			if data.containsError() {
 				log.Println(fmt.Sprintf("File %s read failed. Error: %s", data.filePath, data.readError.Error()))

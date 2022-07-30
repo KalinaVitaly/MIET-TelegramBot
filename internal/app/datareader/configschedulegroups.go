@@ -6,7 +6,7 @@ import (
 
 type ScheduleUniversity struct {
 	GroupsSchedule map[string]*GroupSchedule
-	ClassTime      map[int8]TimeClass
+	ClassTime      map[int8]TimeClasses
 	CurrentWeek    int8
 }
 
@@ -18,7 +18,7 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 		return nil, err
 	}
 
-	classTime := make(map[int8]TimeClass, 7)
+	classTime := make(map[int8]TimeClasses, 7)
 	groupScheduleMap := make(map[string]*GroupSchedule)
 
 	if len(groupSchdule) <= 0 {
@@ -51,6 +51,6 @@ func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {
 	return ""
 }
 
-func (scheduleGroups *ScheduleUniversity) GetTimeClass() map[int8]TimeClass {
+func (scheduleGroups *ScheduleUniversity) GetTimeClass() map[int8]TimeClasses {
 	return scheduleGroups.ClassTime
 }

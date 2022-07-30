@@ -5,39 +5,36 @@ import (
 	"fmt"
 )
 
-type TimeClass struct {
+type TimeClasses struct {
 	Time     string `json:"Time"`
-	Code     int    `json:"Code"`
 	TimeFrom string `json:"TimeFrom"`
 	TimeTo   string `json:"TimeTo"`
 }
 
+type RoomClass struct {
+	Name string `json:"Name"`
+}
+
+type GroupData struct {
+	Name string `json:"Name"`
+}
+
+type ClassData struct {
+	Name        string `json:"Name"`
+	TeacherFull string `json:"TeacherFull"`
+	Teacher     string `json:"Teacher"`
+	Form        string `json:"Form"`
+}
+
 type GroupSchedule struct {
-	Times []TimeClass `json:"Times"`
+	Times []TimeClasses `json:"Times"`
 	Data  []struct {
-		Day       int `json:"Day"`
-		DayNumber int `json:"DayNumber"`
-		Time      struct {
-			Time     string `json:"Time"`
-			Code     int    `json:"Code"`
-			TimeFrom string `json:"TimeFrom"`
-			TimeTo   string `json:"TimeTo"`
-		} `json:"Time"`
-		Class struct {
-			Code        string `json:"Code"`
-			Name        string `json:"Name"`
-			TeacherFull string `json:"TeacherFull"`
-			Teacher     string `json:"Teacher"`
-			Form        string `json:"Form"`
-		} `json:"Class"`
-		Group struct {
-			Code string `json:"Code"`
-			Name string `json:"Name"`
-		} `json:"Group"`
-		Room struct {
-			Code int    `json:"Code"`
-			Name string `json:"Name"`
-		} `json:"Room"`
+		Day       int         `json:"Day"`
+		DayNumber int         `json:"DayNumber"`
+		Time      TimeClasses `json:"Time"`
+		Class     ClassData   `json:"Class"`
+		Group     GroupData   `json:"Group"`
+		Room      RoomClass   `json:"Room"`
 	} `json:"Data"`
 	Semestr string `json:"Semestr"`
 }
