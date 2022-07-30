@@ -42,6 +42,28 @@ type GroupSchedule struct {
 	Semestr string `json:"Semestr"`
 }
 
+type fileTransferData struct {
+	readError      error
+	groupsSchedule *GroupSchedule
+	filePath       string
+}
+
+func newFileTransferData(_groupsSchedule *GroupSchedule, _filePath string, _readError error) *fileTransferData {
+	return &fileTransferData{
+		readError:      _readError,
+		groupsSchedule: _groupsSchedule,
+		filePath:       _filePath,
+	}
+}
+
+func (f *fileTransferData) containsError() bool {
+	if f.readError != nil {
+		return true
+	}
+
+	return false
+}
+
 var helpMessage string = `Список команд:
 						/now (Сейчас) - Пара сейчас
 						/today (Сегодня) - Расписание на сегодня
