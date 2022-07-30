@@ -2,6 +2,7 @@ package telegrambotapi
 
 import (
 	"MIET-TelegramBot/internal/app/datareader"
+	"MIET-TelegramBot/internal/app/timeworker"
 	"fmt"
 	"log"
 
@@ -52,12 +53,13 @@ func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
-	// data, err := timeworker.IdentifyCurrentPair(b.UniversityData.ClassTime)
-	// if err != nil {
-	// 	log.Println(fmt.Sprint("Error now command : %s", err.Error()))
-	// }
-	// log.Println(fmt.Println("Get data now %d", data))
-	return nil
+	msgText, err := timeworker.IdentifyCurrentPair(b.UniversityData.ClassTime)
+	if err != nil {
+		log.Println(fmt.Sprint("Error now command : %s", err.Error()))
+		return nil
+	}
+	log.Println(fmt.Sprintln("Get data now %s", msgText))
+	return b.sendResponseMsg(message, msgText)
 }
 
 func (b *TelegramBot) handleTodayCommand(message *tgbotapi.Message) error {
@@ -147,6 +149,7 @@ func (b *TelegramBot) handleDefaultCommand(message *tgbotapi.Message) error {
 
 func (b *TelegramBot) sendResponseMsg(message *tgbotapi.Message, msgText string) error {
 	msg := tgbotapi.NewMessage(message.Chat.ID, msgText)
+
 	if _, err := b.BotAPI.Send(msg); err != nil {
 		log.Println("Error: ", err.Error())
 		return err

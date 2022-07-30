@@ -59,11 +59,6 @@ func (b *TelegramBot) StartTelegramBotServer() {
 			}
 
 			fmt.Println("This is message : ", update.Message.Text, update.Message.From.UserName)
-
-			// msg := tgbotapi.NewMessage(update.Message.Chat.ID, responceToUser)
-			// msg.ReplyToMessageID = update.Message.MessageID
-
-			// b.BotAPI.Send(msg)
 		}
 	}
 }

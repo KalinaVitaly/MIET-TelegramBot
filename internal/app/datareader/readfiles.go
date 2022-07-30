@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func ReadFilesFromDir(dirPath string) ([]*GroupSchedule, error) {
+func readFilesFromDir(dirPath string) ([]*GroupSchedule, error) {
 	var groupScheduleList []*GroupSchedule
 	chanReadFile := make(chan *fileTransferData)
 	filesPathes, err := getFileNameFromDir(dirPath)

@@ -1,8 +1,6 @@
 package datareader
 
-import (
-	"errors"
-)
+import "strings"
 
 type ScheduleUniversity struct {
 	GroupsSchedule map[string]*GroupSchedule
@@ -11,26 +9,22 @@ type ScheduleUniversity struct {
 }
 
 func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
-
-	groupSchdule, err := ReadFilesFromDir(dirPath)
+	groupSchedule, err := readFilesFromDir(dirPath)
+	const classesCount = 7
 
 	if err != nil {
 		return nil, err
 	}
 
-	classTime := make(map[int8]TimeClasses, 7)
+	classTime := make(map[int8]TimeClasses, classesCount)
 	groupScheduleMap := make(map[string]*GroupSchedule)
 
-	if len(groupSchdule) <= 0 {
-		return nil, errors.New("Error: read GroupSchedule failed!")
+	for i := range groupSchedule[0].Times {
+		classTime[int8(i)] = groupSchedule[0].Times[i]
 	}
 
-	for i := range groupSchdule[0].Times {
-		classTime[int8(i)] = groupSchdule[0].Times[i]
-	}
-
-	for i := range groupSchdule {
-		groupScheduleMap[groupSchdule[i].Data[0].Group.Name] = groupSchdule[i]
+	for i := range groupSchedule {
+		groupScheduleMap[groupSchedule[i].Data[0].Group.Name] = groupSchedule[i]
 	}
 
 	return &ScheduleUniversity{
@@ -41,14 +35,13 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 }
 
 func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {
-	// for i := 0; i < len(scheduleGroups.ClassTime); i++ {
-	// 	result += scheduleGroups.ClassTime[int8(i)].Time + " Начало : " + scheduleGroups.ClassTime[int8(i)].TimeFrom + " Конец : " + scheduleGroups.ClassTime[int8(i)].TimeTo + "\n"
-	// }
+	for i := 0; i < len(scheduleGroups.ClassTime); i++ {
+		result += scheduleGroups.ClassTime[int8(i)].Time + " Начало : " + scheduleGroups.ClassTime[int8(i)].TimeFrom + " Конец : " + scheduleGroups.ClassTime[int8(i)].TimeTo + "\n"
+	}
 
-	// result = strings.Replace(result, "0001-01-01T", "", -1)
+	result = strings.Replace(result, "0001-01-01T", "", -1)
 
-	// return result
-	return ""
+	return result
 }
 
 func (scheduleGroups *ScheduleUniversity) GetTimeClass() map[int8]TimeClasses {

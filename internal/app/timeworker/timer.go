@@ -2,6 +2,8 @@ package timeworker
 
 import (
 	"MIET-TelegramBot/internal/app/datareader"
+	"fmt"
+	"log"
 	"time"
 )
 
@@ -21,10 +23,10 @@ type Timer struct {
 	WeekInfo *WeekInformation
 }
 
-func createWeekInformation() *WeekInformation {
-	weekTypes := make(map[int]string)
-	weekTypes[1] = FirstNumerator
-}
+// func createWeekInformation() *WeekInformation {
+// 	weekTypes := make(map[int]string)
+// 	weekTypes[1] = FirstNumerator
+// }
 
 // Sunday Weekday = iota // Воскресенье
 // Monday                // Понедельник
@@ -48,20 +50,43 @@ func (timer *Timer) GetCurrentWeek() {
 
 }
 
-func (time *Timer) IdentifyCurrentPair(timeClass map[int8]datareader.TimeClass) int {
+func IdentifyCurrentPair(timeClass map[int8]datareader.TimeClasses) (string, error) {
+	currentTime := time.Date(1, 1, 1, time.Now().Hour(), time.Now().Minute(), time.Now().Second(), 0, time.UTC)
+
 	for i := 0; i < len(timeClass); i++ {
-		if i == 0 && timeClass[i].TimeFrom
+		timeFrom, err := convertStringToTime(timeClass[int8(i)].TimeFrom)
+		if err != nil {
+			log.Println(fmt.Sprint("IdentifyCurrentPair Error : convert time from string to date format failed %s", err.Error()))
+			return "", err
+		}
+
+		timeTo, err := convertStringToTime(timeClass[int8(i)].TimeTo)
+
+		if err != nil {
+			log.Println(fmt.Sprint("IdentifyCurrentPair Error : convert time from string to date format failed %s", err.Error()))
+			return "", err
+		}
+
+		if currentTime.Before(timeFrom) {
+			log.Println("Before : ", timeFrom)
+			hours, minutes, seconds := timeFrom.Clock()
+			return fmt.Sprintf("Следующая пара %d в %d:%d:%d", i+1, hours, minutes, seconds), nil
+		} else if currentTime.After(timeFrom) && currentTime.Before(timeTo) {
+			hours, minutes, seconds := timeTo.Clock()
+			return fmt.Sprintf("Сейчас идет пара %d до %d:%d:%d", i+1, hours, minutes, seconds), nil
+		}
 	}
 
+	return "Сейчас пар нет", nil
 }
 
-func convertStringToTime(data string) (time.Time, error) {
-	dataT, err := time.Parse("10:10:10", data)
+func convertStringToTime(timeStr string) (time.Time, error) {
+	timeT, err := time.Parse(time.RFC3339, timeStr+"Z")
 
 	if err != nil {
-		log.Println(fmt.Sprintf("Error convert string time to time type %s", err.Error()
-		return nil, err
+		log.Println(fmt.Sprintf("Error convert string time to time type %s %s", err.Error(), timeStr))
+		return timeT, err
 	}
 
-	return dataT, nil
+	return timeT, nil
 }
