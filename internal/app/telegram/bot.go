@@ -1,7 +1,7 @@
 package telegrambotapi
 
 import (
-	"MIET-TelegramBot/internal/app/datareader"
+	"MIET-TelegramBot/internal/app/filesapi"
 	"fmt"
 	"log"
 
@@ -11,7 +11,7 @@ import (
 type TelegramBot struct {
 	BotAPI         *tgbotapi.BotAPI
 	UpdatesChannel tgbotapi.UpdatesChannel
-	UniversityData *datareader.ScheduleUniversity
+	UniversityData *filesapi.ScheduleUniversity
 }
 
 func CreateTelegramBot(token string, resourcesPath string) (*TelegramBot, error) {
@@ -21,7 +21,7 @@ func CreateTelegramBot(token string, resourcesPath string) (*TelegramBot, error)
 		return nil, err
 	}
 
-	universityData, err := datareader.CreateScheduleUniversity(resourcesPath)
+	universityData, err := filesapi.CreateScheduleUniversity(resourcesPath)
 
 	if err != nil {
 		log.Println("Error read resources files ", err.Error())

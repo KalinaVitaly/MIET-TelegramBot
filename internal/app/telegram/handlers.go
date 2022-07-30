@@ -1,8 +1,8 @@
 package telegrambotapi
 
 import (
-	"MIET-TelegramBot/internal/app/datareader"
-	"MIET-TelegramBot/internal/app/timeworker"
+	"MIET-TelegramBot/internal/app/filesapi"
+	"MIET-TelegramBot/internal/app/timeapi"
 	"fmt"
 	"log"
 
@@ -53,7 +53,7 @@ func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
-	msgText, err := timeworker.IdentifyCurrentPair(b.UniversityData.ClassTime)
+	msgText, err := timeapi.IdentifyCurrentPair(b.UniversityData.ClassTime)
 	if err != nil {
 		log.Println(fmt.Sprint("Error now command : %s", err.Error()))
 		return nil
@@ -133,7 +133,7 @@ func (b *TelegramBot) handleDesubscribeCommand(message *tgbotapi.Message) error 
 }
 
 func (b *TelegramBot) handleHelpCommand(message *tgbotapi.Message) error {
-	msgText := datareader.GetHelpMessage()
+	msgText := filesapi.GetHelpMessage()
 	return b.sendResponseMsg(message, msgText)
 }
 

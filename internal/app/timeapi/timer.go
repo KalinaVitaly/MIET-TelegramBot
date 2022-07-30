@@ -1,7 +1,7 @@
-package timeworker
+package timeapi
 
 import (
-	"MIET-TelegramBot/internal/app/datareader"
+	"MIET-TelegramBot/internal/app/filesapi"
 	"fmt"
 	"log"
 	"time"
@@ -23,19 +23,6 @@ type Timer struct {
 	WeekInfo *WeekInformation
 }
 
-// func createWeekInformation() *WeekInformation {
-// 	weekTypes := make(map[int]string)
-// 	weekTypes[1] = FirstNumerator
-// }
-
-// Sunday Weekday = iota // Воскресенье
-// Monday                // Понедельник
-// Tuesday               // Вторник
-// Wednesday             // Среда
-// Thursday              // Четверг
-// Friday                // Пятница
-// Saturday              // Суббота
-
 func (timer *Timer) GetTodayDayNumber() (string, int) {
 	data := time.Now().Weekday()
 	return data.String(), int(data)
@@ -50,7 +37,7 @@ func (timer *Timer) GetCurrentWeek() {
 
 }
 
-func IdentifyCurrentPair(timeClass map[int8]datareader.TimeClasses) (string, error) {
+func IdentifyCurrentPair(timeClass map[int8]filesapi.TimeClasses) (string, error) {
 	currentTime := time.Date(1, 1, 1, time.Now().Hour(), time.Now().Minute(), time.Now().Second(), 0, time.UTC)
 
 	for i := 0; i < len(timeClass); i++ {
