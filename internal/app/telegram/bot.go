@@ -48,22 +48,22 @@ func (b *TelegramBot) ConfigTelegramBot() {
 func (b *TelegramBot) StartTelegramBotServer() {
 
 	for update := range b.UpdatesChannel {
-		var responceToUser string
+		//var responceToUser string
 		if update.Message != nil { // If we got a message
 			fmt.Println("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 			if update.Message.IsCommand() {
 				fmt.Println("This is command : ", update.Message.Command(), update.Message.From.UserName)
-				b.handlersCommands(update.Message)
+				go b.handlersCommands(update.Message)
 				continue
 			}
 
 			fmt.Println("This is message : ", update.Message.Text, update.Message.From.UserName)
 
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, responceToUser)
-			msg.ReplyToMessageID = update.Message.MessageID
+			// msg := tgbotapi.NewMessage(update.Message.Chat.ID, responceToUser)
+			// msg.ReplyToMessageID = update.Message.MessageID
 
-			b.BotAPI.Send(msg)
+			// b.BotAPI.Send(msg)
 		}
 	}
 }

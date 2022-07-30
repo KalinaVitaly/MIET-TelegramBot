@@ -52,7 +52,11 @@ func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
-
+	// data, err := timeworker.IdentifyCurrentPair(b.UniversityData.ClassTime)
+	// if err != nil {
+	// 	log.Println(fmt.Sprint("Error now command : %s", err.Error()))
+	// }
+	// log.Println(fmt.Println("Get data now %d", data))
 	return nil
 }
 
@@ -127,24 +131,22 @@ func (b *TelegramBot) handleDesubscribeCommand(message *tgbotapi.Message) error 
 }
 
 func (b *TelegramBot) handleHelpCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, datareader.GetHelpMessage())
-	if _, err := b.BotAPI.Send(msg); err != nil {
-		log.Println("Error: ", err.Error())
-		return err
-	}
-	return nil
+	msgText := datareader.GetHelpMessage()
+	return b.sendResponseMsg(message, msgText)
 }
 
 func (b *TelegramBot) handleClassTimeCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, b.UniversityData.ClassTimeToString())
-	if _, err := b.BotAPI.Send(msg); err != nil {
-		log.Println("Error: ", err.Error())
-	}
-	return nil
+	msgText := b.UniversityData.ClassTimeToString()
+	return b.sendResponseMsg(message, msgText)
 }
 
 func (b *TelegramBot) handleDefaultCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("Неизвестная комманда %s", message.Command()))
+	msgText := fmt.Sprintf("Неизвестная комманда %s", message.Command())
+	return b.sendResponseMsg(message, msgText)
+}
+
+func (b *TelegramBot) sendResponseMsg(message *tgbotapi.Message, msgText string) error {
+	msg := tgbotapi.NewMessage(message.Chat.ID, msgText)
 	if _, err := b.BotAPI.Send(msg); err != nil {
 		log.Println("Error: ", err.Error())
 		return err
