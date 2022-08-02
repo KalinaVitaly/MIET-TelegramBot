@@ -4,41 +4,69 @@ import (
 	"MIET-TelegramBot/internal/app/filesapi"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 )
 
 const (
-	FirstNumerator    = "1 числитель"
-	SecondNumerator   = "2 числитель"
-	FirstDeniminator  = "1 знаменатель"
-	SecondDeniminator = "2 знаменатель"
+	weekTypesCount = 4
 )
 
+var WeekTypes [weekTypesCount]string
+
+func init() {
+	WeekTypes = [...]string{
+		"1 числитель",
+		"2 числитель",
+		"1 знаменатель",
+		"2 знаменатель",
+	}
+}
+
 type WeekInformation struct {
-	StartData  time.Time
-	WeeksTypes map[int]string
+	weekTypeStr    string
+	weekTypeNumber int
 }
 
-type Timer struct {
-	WeekInfo *WeekInformation
+type TimeInformation struct {
+	weekInfo      WeekInformation
+	mutexWeekInfo sync.RWMutex
 }
 
-func (timer *Timer) GetTodayDayNumber() (string, int) {
+func (timer *TimeInformation) UpdateWeekType() {
+	go func(_timer *TimeInformation) {
+		// for {
+		// 	select {
+		// 		case
+		// 	}
+		// }
+	}(timer)
+}
+
+func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
 	data := time.Now().Weekday()
 	return data.String(), int(data)
 }
 
-func (timer *Timer) GetTomorrowDayNumber() (string, int) {
-	data := time.Now().Add(24 * time.Hour).Weekday()
-	return data.String(), int(data)
+func (timer *TimeInformation) GetTomorrowDayNumberAndWeekType() (string, int, string, int) {
+	dayData := time.Now().Add(24 * time.Hour).Weekday()
+	timer.mutexWeekInfo.RLock()
+	timer.mutexWeekInfo.RUnlock()
+	return dayData.String(), int(dayData), timer.weekInfo.weekTypeStr, timer.weekInfo.weekTypeNumber
 }
 
-func (timer *Timer) GetCurrentWeek() {
-
+func (timer *TimeInformation) GetCurrentWeekType() *WeekInformation {
+	timer.mutexWeekInfo.RLock()
+	defer timer.mutexWeekInfo.RUnlock()
+	return &timer.weekInfo
 }
 
 func IdentifyCurrentPair(timeClass map[int8]filesapi.TimeClasses) (string, error) {
 	currentTime := time.Date(1, 1, 1, time.Now().Hour(), time.Now().Minute(), time.Now().Second(), 0, time.UTC)
+
+	// if _, dayNumber := timer.GetTodayDayNumber(); dayNumber == 0 {
+	// 	return "Сегодня пар нет", nil
+	// }
 
 	for i := 0; i < len(timeClass); i++ {
 		timeFrom, err := convertStringToTime(timeClass[int8(i)].TimeFrom)
@@ -57,10 +85,10 @@ func IdentifyCurrentPair(timeClass map[int8]filesapi.TimeClasses) (string, error
 		if currentTime.Before(timeFrom) {
 			log.Println("Before : ", timeFrom)
 			hours, minutes, seconds := timeFrom.Clock()
-			return fmt.Sprintf("Следующая пара %d в %d:%d:%d", i+1, hours, minutes, seconds), nil
+			return fmt.Sprintf("Следующая пара %d в %.2d:%.2d:%.2d", i+1, hours, minutes, seconds), nil
 		} else if currentTime.After(timeFrom) && currentTime.Before(timeTo) {
 			hours, minutes, seconds := timeTo.Clock()
-			return fmt.Sprintf("Сейчас идет пара %d до %d:%d:%d", i+1, hours, minutes, seconds), nil
+			return fmt.Sprintf("Сейчас идет пара %d до %.2d:%.2d:%.2d", i+1, hours, minutes, seconds), nil
 		}
 	}
 
