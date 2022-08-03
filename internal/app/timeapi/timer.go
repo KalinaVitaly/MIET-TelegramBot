@@ -26,21 +26,57 @@ func init() {
 type WeekInformation struct {
 	weekTypeStr    string
 	weekTypeNumber int
+	mutex          sync.RWMutex
 }
 
 type TimeInformation struct {
-	weekInfo      WeekInformation
-	mutexWeekInfo sync.RWMutex
+	weekInfo *WeekInformation
+}
+
+func CreateTimeInformation() *TimeInformation {
+	return &TimeInformation{
+		weekInfo: &WeekInformation{},
+	}
+}
+
+func (wi *WeekInformation) incrementWeekInformation() {
+	wi.mutex.Lock()
+	wi.weekTypeNumber = (wi.weekTypeNumber + 1) % weekTypesCount
+	wi.weekTypeStr = WeekTypes[wi.weekTypeNumber]
+	wi.mutex.Unlock()
 }
 
 func (timer *TimeInformation) UpdateWeekType() {
 	go func(_timer *TimeInformation) {
-		// for {
-		// 	select {
-		// 		case
-		// 	}
-		// }
+		//added signal end of work
+		for alive := true; alive; {
+			timeToMonday, err := getTimeToMonday()
+
+			if err != nil {
+				log.Println(fmt.Sprintln("Error %s", err.Error))
+			}
+			timer := time.NewTimer(timeToMonday)
+			select {
+			case <-timer.C:
+				_timer.weekInfo.incrementWeekInformation()
+			}
+		}
 	}(timer)
+}
+
+func getTimeToMonday() (time.Duration, error) {
+	var timeToMonday time.Duration
+	for i := 0; i < 8; i++ {
+
+		weekday := time.Now().Add(time.Duration(i) * 24 * time.Hour).Weekday()
+		if weekday == time.Monday {
+			timeToMonday =
+				time.Until(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+i, 0, 0, 0, 0, time.Local))
+			return timeToMonday, nil
+		}
+	}
+
+	return timeToMonday, fmt.Errorf("Error calc weekday")
 }
 
 func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
@@ -50,23 +86,23 @@ func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
 
 func (timer *TimeInformation) GetTomorrowDayNumberAndWeekType() (string, int, string, int) {
 	dayData := time.Now().Add(24 * time.Hour).Weekday()
-	timer.mutexWeekInfo.RLock()
-	timer.mutexWeekInfo.RUnlock()
+	timer.weekInfo.mutex.RLock()
+	timer.weekInfo.mutex.RUnlock()
 	return dayData.String(), int(dayData), timer.weekInfo.weekTypeStr, timer.weekInfo.weekTypeNumber
 }
 
 func (timer *TimeInformation) GetCurrentWeekType() *WeekInformation {
-	timer.mutexWeekInfo.RLock()
-	defer timer.mutexWeekInfo.RUnlock()
-	return &timer.weekInfo
+	timer.weekInfo.mutex.RLock()
+	defer timer.weekInfo.mutex.RUnlock()
+	return timer.weekInfo
 }
 
-func IdentifyCurrentPair(timeClass map[int8]filesapi.TimeClasses) (string, error) {
+func (timer *TimeInformation) IdentifyCurrentPair(timeClass map[int8]filesapi.TimeClasses) (string, error) {
 	currentTime := time.Date(1, 1, 1, time.Now().Hour(), time.Now().Minute(), time.Now().Second(), 0, time.UTC)
 
-	// if _, dayNumber := timer.GetTodayDayNumber(); dayNumber == 0 {
-	// 	return "Сегодня пар нет", nil
-	// }
+	if _, dayNumber := timer.GetTodayDayNumber(); dayNumber == 0 {
+		return "Сегодня пар нет", nil
+	}
 
 	for i := 0; i < len(timeClass); i++ {
 		timeFrom, err := convertStringToTime(timeClass[int8(i)].TimeFrom)
