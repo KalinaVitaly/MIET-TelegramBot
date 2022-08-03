@@ -10,13 +10,6 @@ import (
 
 const (
 	weekTypesCount = 4
-	Monday         = iota + 1
-	Tuesday
-	Wednesday
-	Thursday
-	Friday
-	Saturday
-	Sunday
 )
 
 var WeekTypes [weekTypesCount]string
@@ -57,15 +50,12 @@ func (timer *TimeInformation) UpdateWeekType() {
 	go func(_timer *TimeInformation) {
 		//added signal end of work
 		for alive := true; alive; {
-			// Sunday Weekday = iota
-			// Monday 1
-			// Tuesday 2
-			// Wednesday 3
-			// Thursday 4
-			// Friday 5
-			// Saturday 6
-			getDaysToMonday()
-			timer := time.NewTimer(5 * time.Second)
+			timeToMonday, err := getTimeToMonday()
+
+			if err != nil {
+				log.Println(fmt.Sprintln("Error %s", err.Error))
+			}
+			timer := time.NewTimer(timeToMonday)
 			select {
 			case <-timer.C:
 				_timer.weekInfo.incrementWeekInformation()
@@ -74,16 +64,19 @@ func (timer *TimeInformation) UpdateWeekType() {
 	}(timer)
 }
 
-func getDaysToMonday() int {
+func getTimeToMonday() (time.Duration, error) {
+	var timeToMonday time.Duration
 	for i := 0; i < 8; i++ {
 
 		weekday := time.Now().Add(time.Duration(i) * 24 * time.Hour).Weekday()
 		if weekday == time.Monday {
-			return int(weekday)
+			timeToMonday =
+				time.Until(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+i, 0, 0, 0, 0, time.Local))
+			return timeToMonday, nil
 		}
 	}
 
-	return -1
+	return timeToMonday, fmt.Errorf("Error calc weekday")
 }
 
 func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
