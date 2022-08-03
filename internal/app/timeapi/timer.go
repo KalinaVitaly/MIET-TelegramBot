@@ -64,7 +64,7 @@ func (timer *TimeInformation) UpdateWeekType() {
 			// Thursday 4
 			// Friday 5
 			// Saturday 6
-
+			getDaysToMonday()
 			timer := time.NewTimer(5 * time.Second)
 			select {
 			case <-timer.C:
@@ -72,6 +72,18 @@ func (timer *TimeInformation) UpdateWeekType() {
 			}
 		}
 	}(timer)
+}
+
+func getDaysToMonday() int {
+	for i := 0; i < 8; i++ {
+
+		weekday := time.Now().Add(time.Duration(i) * 24 * time.Hour).Weekday()
+		if weekday == time.Monday {
+			return int(weekday)
+		}
+	}
+
+	return -1
 }
 
 func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
