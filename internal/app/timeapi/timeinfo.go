@@ -4,49 +4,20 @@ import (
 	"MIET-TelegramBot/internal/app/filesapi"
 	"fmt"
 	"log"
-	"sync"
 	"time"
 )
 
-const (
-	weekTypesCount = 4
-)
-
-var WeekTypes [weekTypesCount]string
-
-func init() {
-	WeekTypes = [...]string{
-		"1 числитель",
-		"2 числитель",
-		"1 знаменатель",
-		"2 знаменатель",
-	}
-}
-
-type WeekInformation struct {
-	WeekTypeStr    string
-	WeekTypeNumber int
-	mutex          sync.RWMutex
-}
-
 type TimeInformation struct {
-	weekInfo *WeekInformation
+	WeekInfo *WeekInformation
 }
 
 func CreateTimeInformation() *TimeInformation {
 	return &TimeInformation{
-		weekInfo: &WeekInformation{
+		WeekInfo: &WeekInformation{
 			WeekTypeNumber: 0,
-			WeekTypeStr:    WeekTypes[0],
+			WeekTypeStr:    weekTypes[0],
 		},
 	}
-}
-
-func (wi *WeekInformation) incrementWeekInformation() {
-	wi.mutex.Lock()
-	wi.WeekTypeNumber = (wi.WeekTypeNumber + 1) % weekTypesCount
-	wi.WeekTypeStr = WeekTypes[wi.WeekTypeNumber]
-	wi.mutex.Unlock()
 }
 
 func (timer *TimeInformation) UpdateWeekType() {
@@ -61,25 +32,10 @@ func (timer *TimeInformation) UpdateWeekType() {
 			timer := time.NewTimer(timeToMonday)
 			select {
 			case <-timer.C:
-				_timer.weekInfo.incrementWeekInformation()
+				_timer.WeekInfo.incrementWeekInformation()
 			}
 		}
 	}(timer)
-}
-
-func getTimeToMonday() (time.Duration, error) {
-	var timeToMonday time.Duration
-	for i := 0; i < 8; i++ {
-
-		weekday := time.Now().Add(time.Duration(i) * 24 * time.Hour).Weekday()
-		if weekday == time.Monday {
-			timeToMonday =
-				time.Until(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+i, 0, 0, 0, 0, time.Local))
-			return timeToMonday, nil
-		}
-	}
-
-	return timeToMonday, fmt.Errorf("Error calc weekday")
 }
 
 func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
@@ -89,15 +45,9 @@ func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
 
 func (timer *TimeInformation) GetTomorrowDayNumberAndWeekType() (string, int, string, int) {
 	dayData := time.Now().Add(24 * time.Hour).Weekday()
-	timer.weekInfo.mutex.RLock()
-	timer.weekInfo.mutex.RUnlock()
-	return dayData.String(), int(dayData), timer.weekInfo.WeekTypeStr, timer.weekInfo.WeekTypeNumber
-}
-
-func (timer *TimeInformation) GetCurrentWeekType() *WeekInformation {
-	timer.weekInfo.mutex.RLock()
-	defer timer.weekInfo.mutex.RUnlock()
-	return timer.weekInfo
+	timer.WeekInfo.mutex.RLock()
+	timer.WeekInfo.mutex.RUnlock()
+	return dayData.String(), int(dayData), timer.WeekInfo.WeekTypeStr, timer.WeekInfo.WeekTypeNumber
 }
 
 func (timer *TimeInformation) IdentifyCurrentPair(timeClass map[int8]filesapi.TimeClasses) (string, error) {
