@@ -2,7 +2,6 @@ package telegrambotapi
 
 import (
 	"MIET-TelegramBot/internal/app/filesapi"
-	"MIET-TelegramBot/internal/app/timeapi"
 	"fmt"
 	"log"
 
@@ -53,7 +52,7 @@ func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
-	msgText, err := timeapi.IdentifyCurrentPair(b.UniversityData.ClassTime)
+	msgText, err := b.TimeInfo.IdentifyCurrentPair(b.UniversityData.ClassTime)
 	if err != nil {
 		log.Println(fmt.Sprint("Error now command : %s", err.Error()))
 		return nil
@@ -88,8 +87,8 @@ func (b *TelegramBot) handleWeekScheduleShortCommand(message *tgbotapi.Message) 
 }
 
 func (b *TelegramBot) handleWeekCommand(message *tgbotapi.Message) error {
-
-	return nil
+	msgText := b.TimeInfo.GetCurrentWeekType()
+	return b.sendResponseMsg(message, msgText.WeekTypeStr)
 }
 
 func (b *TelegramBot) handleGroupCommand(message *tgbotapi.Message) error {

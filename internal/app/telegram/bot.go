@@ -2,6 +2,7 @@ package telegrambotapi
 
 import (
 	"MIET-TelegramBot/internal/app/filesapi"
+	"MIET-TelegramBot/internal/app/timeapi"
 	"fmt"
 	"log"
 
@@ -12,6 +13,7 @@ type TelegramBot struct {
 	BotAPI         *tgbotapi.BotAPI
 	UpdatesChannel tgbotapi.UpdatesChannel
 	UniversityData *filesapi.ScheduleUniversity
+	TimeInfo       *timeapi.TimeInformation
 }
 
 func CreateTelegramBot(token string, resourcesPath string) (*TelegramBot, error) {
@@ -28,9 +30,12 @@ func CreateTelegramBot(token string, resourcesPath string) (*TelegramBot, error)
 		return nil, err
 	}
 
+	timeInfo := timeapi.CreateTimeInformation()
+
 	return &TelegramBot{
 		BotAPI:         bot,
 		UniversityData: universityData,
+		TimeInfo:       timeInfo,
 	}, nil
 }
 

@@ -24,8 +24,8 @@ func init() {
 }
 
 type WeekInformation struct {
-	weekTypeStr    string
-	weekTypeNumber int
+	WeekTypeStr    string
+	WeekTypeNumber int
 	mutex          sync.RWMutex
 }
 
@@ -35,14 +35,17 @@ type TimeInformation struct {
 
 func CreateTimeInformation() *TimeInformation {
 	return &TimeInformation{
-		weekInfo: &WeekInformation{},
+		weekInfo: &WeekInformation{
+			WeekTypeNumber: 0,
+			WeekTypeStr:    WeekTypes[0],
+		},
 	}
 }
 
 func (wi *WeekInformation) incrementWeekInformation() {
 	wi.mutex.Lock()
-	wi.weekTypeNumber = (wi.weekTypeNumber + 1) % weekTypesCount
-	wi.weekTypeStr = WeekTypes[wi.weekTypeNumber]
+	wi.WeekTypeNumber = (wi.WeekTypeNumber + 1) % weekTypesCount
+	wi.WeekTypeStr = WeekTypes[wi.WeekTypeNumber]
 	wi.mutex.Unlock()
 }
 
@@ -88,7 +91,7 @@ func (timer *TimeInformation) GetTomorrowDayNumberAndWeekType() (string, int, st
 	dayData := time.Now().Add(24 * time.Hour).Weekday()
 	timer.weekInfo.mutex.RLock()
 	timer.weekInfo.mutex.RUnlock()
-	return dayData.String(), int(dayData), timer.weekInfo.weekTypeStr, timer.weekInfo.weekTypeNumber
+	return dayData.String(), int(dayData), timer.weekInfo.WeekTypeStr, timer.weekInfo.WeekTypeNumber
 }
 
 func (timer *TimeInformation) GetCurrentWeekType() *WeekInformation {
