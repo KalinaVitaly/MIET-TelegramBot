@@ -63,7 +63,7 @@ func (b *TelegramBot) StartTelegramBotServer() {
 				continue
 			}
 
-			fmt.Println("This is message : ", update.Message.Text, update.Message.From.UserName)
+			fmt.Println("This is message : ", update.Message.Text, update.Message.From.UserName, update.Message.From.ID)
 		}
 	}
 }
