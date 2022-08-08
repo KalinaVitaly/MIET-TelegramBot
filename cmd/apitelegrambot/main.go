@@ -24,6 +24,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	telegramserver.NewDB()
+
 	bot, err := telegrambotapi.CreateTelegramBot(config.Token, config.ResourcesPath)
 
 	if err != nil {
