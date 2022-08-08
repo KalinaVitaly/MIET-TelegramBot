@@ -7,6 +7,17 @@ import (
 	"time"
 )
 
+var WeekTypes [weekTypesCount]string
+
+func init() {
+	WeekTypes = [...]string{
+		"1 числитель",
+		"2 числитель",
+		"1 знаменатель",
+		"2 знаменатель",
+	}
+}
+
 type TimeInformation struct {
 	WeekInfo *WeekInformation
 }
@@ -15,7 +26,7 @@ func CreateTimeInformation() *TimeInformation {
 	return &TimeInformation{
 		WeekInfo: &WeekInformation{
 			WeekTypeNumber: 0,
-			WeekTypeStr:    weekTypes[0],
+			WeekTypeStr:    WeekTypes[0],
 		},
 	}
 }
@@ -45,9 +56,16 @@ func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
 
 func (timer *TimeInformation) GetTomorrowDayNumberAndWeekType() (string, int, string, int) {
 	dayData := time.Now().Add(24 * time.Hour).Weekday()
+
 	timer.WeekInfo.mutex.RLock()
 	timer.WeekInfo.mutex.RUnlock()
 	return dayData.String(), int(dayData), timer.WeekInfo.WeekTypeStr, timer.WeekInfo.WeekTypeNumber
+}
+
+func (timer *TimeInformation) GetCurrentWeekType() *WeekInformation {
+	timer.WeekInfo.mutex.RLock()
+	defer timer.WeekInfo.mutex.RUnlock()
+	return timer.WeekInfo
 }
 
 func (timer *TimeInformation) IdentifyCurrentPair(timeClass map[int8]filesapi.TimeClasses) (string, error) {
