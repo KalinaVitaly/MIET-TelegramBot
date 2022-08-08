@@ -1,2 +1,7 @@
 token = "5359781859:AAHNd1q24hgH-FGY1DBdfcidys3Qv-wDydE"
 resources_path = "./resources/"
+host = "127.0.0.1"
+port = "5432"
+user = "postgres"
+password = "postgres"
+dbname = "miet_tgbot_db"
