@@ -87,7 +87,7 @@ func (b *TelegramBot) handleWeekScheduleShortCommand(message *tgbotapi.Message) 
 }
 
 func (b *TelegramBot) handleWeekCommand(message *tgbotapi.Message) error {
-	msgText := b.TimeInfo.WeekInfo.GetCurrentWeekType()
+	msgText := b.TimeInfo.GetCurrentWeekType()
 	return b.sendResponseMsg(message, msgText.WeekTypeStr)
 }
 
