@@ -13,7 +13,7 @@ type UserRepository struct {
 func (u *UserRepository) Create(user *models.UserModel) error {
 
 	_, err := u.repository.db.Exec(
-		`INSERT INTO miet_tgbot_db.member (
+		`INSERT INTO member (
 			user_tg_id,
 			first_name,
 			last_name,
@@ -23,7 +23,7 @@ func (u *UserRepository) Create(user *models.UserModel) error {
 		VALUES (
 			$1,
 			$2,
-			$3
+			$3,
 			$4,
 			$5
 		) `,
@@ -44,7 +44,7 @@ func (u *UserRepository) Create(user *models.UserModel) error {
 
 func (u *UserRepository) Delete(user *models.UserModel) error {
 	_, err := u.repository.db.Exec(`
-		DELETE FROM miet_tgbot_db.member 
+		DELETE FROM member 
 		WHERE user_tg_id = $1`,
 		user.UserTgId)
 

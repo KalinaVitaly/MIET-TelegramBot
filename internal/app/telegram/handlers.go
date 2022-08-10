@@ -2,6 +2,7 @@ package telegrambotapi
 
 import (
 	"MIET-TelegramBot/internal/app/filesapi"
+	"MIET-TelegramBot/internal/app/store/models"
 	"fmt"
 	"log"
 
@@ -98,17 +99,34 @@ func (b *TelegramBot) handleGroupCommand(message *tgbotapi.Message) error {
 
 func (b *TelegramBot) handleAuthCommand(message *tgbotapi.Message) error {
 
-	return nil
+	//Add group validation
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, message.CommandArguments())
+
+	if err := b.DataBase.User().Create(user); err != nil {
+		log.Println(fmt.Sprint("Error create user : %s", err.Error()))
+		b.sendResponseMsg(message, "Ошибка при авторизации")
+		return err
+	}
+
+	log.Println(fmt.Sprint("New user auth : %+v", *user))
+	return b.sendResponseMsg(message, "Пользователь успешно авторизован")
 }
 
 func (b *TelegramBot) handleAuthTeacherCommand(message *tgbotapi.Message) error {
-
 	return nil
 }
 
 func (b *TelegramBot) handleDeauthCommand(message *tgbotapi.Message) error {
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, message.CommandArguments())
 
-	return nil
+	if err := b.DataBase.User().Delete(user); err != nil {
+		log.Println(fmt.Sprint("Error create user : %s", err.Error()))
+		b.sendResponseMsg(message, "Что-то пошло не так ...")
+		return err
+	}
+
+	log.Println(fmt.Sprint("User deauth : %+v", *user))
+	return b.sendResponseMsg(message, "Пользователь деавторизован")
 }
 
 func (b *TelegramBot) handleDeauthTeacherCommand(message *tgbotapi.Message) error {

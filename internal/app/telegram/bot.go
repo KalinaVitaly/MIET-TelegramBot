@@ -2,6 +2,8 @@ package telegrambotapi
 
 import (
 	"MIET-TelegramBot/internal/app/filesapi"
+	"MIET-TelegramBot/internal/app/store/repository"
+	"MIET-TelegramBot/internal/app/telegramserver"
 	"MIET-TelegramBot/internal/app/timeapi"
 	"fmt"
 	"log"
@@ -14,10 +16,11 @@ type TelegramBot struct {
 	UpdatesChannel tgbotapi.UpdatesChannel
 	UniversityData *filesapi.ScheduleUniversity
 	TimeInfo       *timeapi.TimeInformation
+	DataBase       *repository.Repository
 }
 
-func CreateTelegramBot(token string, resourcesPath string) (*TelegramBot, error) {
-	bot, err := tgbotapi.NewBotAPI(token)
+func CreateTelegramBot(configData *telegramserver.Config, resourcesPath string) (*TelegramBot, error) {
+	bot, err := tgbotapi.NewBotAPI(configData.Token)
 	if err != nil {
 		log.Println("Error get bot ", err.Error())
 		return nil, err
@@ -32,10 +35,20 @@ func CreateTelegramBot(token string, resourcesPath string) (*TelegramBot, error)
 
 	timeInfo := timeapi.CreateTimeInformation()
 
+	db, err := telegramserver.NewDB(configData)
+
+	if err != nil {
+		log.Println("Error create data base ", err.Error())
+		return nil, err
+	}
+
+	repository := repository.NewRepository(db)
+
 	return &TelegramBot{
 		BotAPI:         bot,
 		UniversityData: universityData,
 		TimeInfo:       timeInfo,
+		DataBase:       repository,
 	}, nil
 }
 
