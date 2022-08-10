@@ -7,17 +7,6 @@ import (
 	"time"
 )
 
-var WeekTypes [weekTypesCount]string
-
-func init() {
-	WeekTypes = [...]string{
-		"1 числитель",
-		"2 числитель",
-		"1 знаменатель",
-		"2 знаменатель",
-	}
-}
-
 type TimeInformation struct {
 	WeekInfo *WeekInformation
 }
@@ -26,7 +15,7 @@ func CreateTimeInformation() *TimeInformation {
 	return &TimeInformation{
 		WeekInfo: &WeekInformation{
 			WeekTypeNumber: 0,
-			WeekTypeStr:    WeekTypes[0],
+			WeekTypeStr:    weekTypes[0],
 		},
 	}
 }
