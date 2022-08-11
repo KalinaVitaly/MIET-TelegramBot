@@ -79,10 +79,23 @@ func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
 
 func (b *TelegramBot) handleTodayCommand(message *tgbotapi.Message) error {
 
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
+
 	return nil
 }
 
 func (b *TelegramBot) handleTomorrowCommand(message *tgbotapi.Message) error {
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
 
 	return nil
 }
@@ -93,11 +106,24 @@ func (b *TelegramBot) handleTeacherAllCommand(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleWeekScheduleCommand(message *tgbotapi.Message) error {
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
 
 	return nil
 }
 
 func (b *TelegramBot) handleWeekScheduleShortCommand(message *tgbotapi.Message) error {
+
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
 
 	return nil
 }
@@ -181,15 +207,36 @@ func (b *TelegramBot) handleDeauthTeacherCommand(message *tgbotapi.Message) erro
 
 func (b *TelegramBot) handleSubscribtionCommand(message *tgbotapi.Message) error {
 
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
+
 	return nil
 }
 
 func (b *TelegramBot) handleSubscribeCommand(message *tgbotapi.Message) error {
 
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
+
 	return nil
 }
 
 func (b *TelegramBot) handleDesubscribeCommand(message *tgbotapi.Message) error {
+
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
 
 	return nil
 }
