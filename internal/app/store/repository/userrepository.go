@@ -59,7 +59,8 @@ func (u *UserRepository) Contains(user *models.UserModel) (bool, error) {
 	var count bool
 	row := u.repository.db.QueryRow(`
 		SELECT COUNT(*)
-		WHERE  user_tg_id = $1 
+		FROM member
+		WHERE  user_tg_id = $1
 			AND first_name = $2
 			AND last_name = $3 
 			AND username = $4
@@ -76,6 +77,7 @@ func (u *UserRepository) Group(user *models.UserModel) (string, error) {
 	var group string
 	row := u.repository.db.QueryRow(`
 		SELECT group_name
+		FROM member
 		WHERE  user_tg_id = $1 
 			AND first_name = $2
 			AND last_name = $3 

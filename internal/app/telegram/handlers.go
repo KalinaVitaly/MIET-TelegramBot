@@ -52,6 +52,21 @@ func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 	}
 }
 
+func (b *TelegramBot) isUserAuth(message *tgbotapi.Message) (bool, string, error) {
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
+	if isAuth, err := b.DataBase.User().Contains(user); err != nil {
+		log.Println(fmt.Sprint("Error check contains user in db : %s", err.Error()))
+		return false, "Что-то пошло не так...", err
+	} else {
+		if isAuth {
+			log.Println(fmt.Sprint("User %+v contains in db", user))
+			return true, "Пользователь авторизован", nil
+		}
+	}
+
+	return false, "Пользователь не авторизован", nil
+}
+
 func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
 	msgText, err := b.TimeInfo.IdentifyCurrentPair(b.UniversityData.ClassTime)
 	if err != nil {
@@ -93,14 +108,37 @@ func (b *TelegramBot) handleWeekCommand(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleGroupCommand(message *tgbotapi.Message) error {
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
 
-	return nil
+	isAuth, msg, err := b.isUserAuth(message)
+
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
+
+	group, err := b.DataBase.User().Group(user)
+
+	if err != nil {
+		log.Println(fmt.Sprint("Error get user group %+v from db", user))
+		return err
+	}
+
+	return b.sendResponseMsg(message, group)
 }
 
 func (b *TelegramBot) handleAuthCommand(message *tgbotapi.Message) error {
 
 	//Add group validation
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, message.CommandArguments())
+
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
 
 	if err := b.DataBase.User().Create(user); err != nil {
 		log.Println(fmt.Sprint("Error create user : %s", err.Error()))
@@ -117,7 +155,14 @@ func (b *TelegramBot) handleAuthTeacherCommand(message *tgbotapi.Message) error 
 }
 
 func (b *TelegramBot) handleDeauthCommand(message *tgbotapi.Message) error {
-	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, message.CommandArguments())
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
+
+	isAuth, msg, err := b.isUserAuth(message)
+	if err != nil {
+		return b.sendResponseMsg(message, msg)
+	} else if !isAuth {
+		return b.sendResponseMsg(message, msg)
+	}
 
 	if err := b.DataBase.User().Delete(user); err != nil {
 		log.Println(fmt.Sprint("Error create user : %s", err.Error()))
