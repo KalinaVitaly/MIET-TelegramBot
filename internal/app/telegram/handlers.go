@@ -12,7 +12,7 @@ import (
 func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 	log.Println(fmt.Sprintf("Комманда %s от пользователя %s", message.Command(), message.From.UserName))
 	switch message.Command() {
-
+	//add error handle
 	case "now":
 		return b.handleNowCommand(message)
 	case "today":
@@ -157,7 +157,15 @@ func (b *TelegramBot) handleGroupCommand(message *tgbotapi.Message) error {
 func (b *TelegramBot) handleAuthCommand(message *tgbotapi.Message) error {
 
 	//Add group validation
-	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, message.CommandArguments())
+
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
+
+	if !user.ValidGroup(message.CommandArguments()) {
+		log.Println(fmt.Println("Invalid group value : %s", message.CommandArguments()))
+		return b.sendResponseMsg(message, "Группы не существует")
+	}
+
+	user.SetGroup(message.CommandArguments())
 
 	isAuth, msg, err := b.isUserAuth(message)
 	if err != nil {
