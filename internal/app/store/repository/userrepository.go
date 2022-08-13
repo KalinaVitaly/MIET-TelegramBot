@@ -89,5 +89,7 @@ func (u *UserRepository) Group(user *models.UserModel) (string, error) {
 		return "", err
 	}
 
+	user.Group = group
+
 	return group, nil
 }

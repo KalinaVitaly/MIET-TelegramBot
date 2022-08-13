@@ -46,9 +46,22 @@ func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
 func (timer *TimeInformation) GetTomorrowDayNumberAndWeekType() (string, int, string, int) {
 	dayData := time.Now().Add(24 * time.Hour).Weekday()
 
+	tomorrowNumber := int(dayData)
+	tomorrowString := dayData.String()
+
 	timer.WeekInfo.mutex.RLock()
+
+	weekTypeString := timer.WeekInfo.WeekTypeStr
+	weekTypeNumber := timer.WeekInfo.WeekTypeNumber
+
 	timer.WeekInfo.mutex.RUnlock()
-	return dayData.String(), int(dayData), timer.WeekInfo.WeekTypeStr, timer.WeekInfo.WeekTypeNumber
+
+	if tomorrowNumber == 1 {
+		weekTypeNumber = (weekTypeNumber + 1) % weekTypesCount
+		weekTypeString = weekTypes[weekTypeNumber]
+	}
+
+	return tomorrowString, tomorrowNumber, weekTypeString, weekTypeNumber
 }
 
 func (timer *TimeInformation) GetCurrentWeekType() *WeekInformation {
