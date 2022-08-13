@@ -1,6 +1,10 @@
 package filesapi
 
-import "strings"
+import (
+	"fmt"
+	"log"
+	"strings"
+)
 
 type ScheduleUniversity struct {
 	GroupsSchedule map[string]*GroupSchedule
@@ -24,7 +28,24 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 	}
 
 	for i := range groupSchedule {
+		log.Println(groupSchedule[i].Data[0].Group.Name)
 		groupScheduleMap[groupSchedule[i].Data[0].Group.Name] = groupSchedule[i]
+	}
+	// Day       int         `json:"Day"`
+	// DayNumber int         `json:"DayNumber"`
+	// Time      TimeClasses `json:"Time"`
+	// Class     ClassData   `json:"Class"`
+	// Group     GroupData   `json:"Group"`
+	// Room      RoomClass   `json:"Room"`
+
+	for _, value := range groupScheduleMap["ПИН-44"].Data {
+		fmt.Println("************************************************************")
+		fmt.Println("Day : ", value.Day)
+		fmt.Println("Day number  : ", value.DayNumber)
+		fmt.Println("Time  : ", value.Time)
+		fmt.Println("Class  : ", value.Class)
+		fmt.Println("Group   : ", value.Group)
+		fmt.Println("Room  : ", value.Room)
 	}
 
 	return &ScheduleUniversity{
@@ -32,6 +53,23 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 			GroupsSchedule: groupScheduleMap,
 		},
 		nil
+}
+
+func (s *ScheduleUniversity) GetClassesToday(group string, dayNumber, weekType int) string {
+	var todaySchedule string
+
+	for _, value := range s.GroupsSchedule[group].Data {
+		if value.Day == dayNumber && value.DayNumber == weekType {
+			todaySchedule += value.Time.TimeFrom + "\n"
+			todaySchedule += value.Class.Name + "\n"
+			todaySchedule += value.Class.TeacherFull + "\n"
+			todaySchedule += value.Class.Form + "\n"
+			todaySchedule += "Кабинет : " + value.Room.Name + "\n\n"
+
+			continue
+		}
+	}
+	return todaySchedule
 }
 
 func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {

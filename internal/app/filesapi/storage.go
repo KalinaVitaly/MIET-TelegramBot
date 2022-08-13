@@ -57,17 +57,19 @@ type ClassData struct {
 	Form        string `json:"Form"`
 }
 
+type DayData struct {
+	Day       int         `json:"Day"`
+	DayNumber int         `json:"DayNumber"`
+	Time      TimeClasses `json:"Time"`
+	Class     ClassData   `json:"Class"`
+	Group     GroupData   `json:"Group"`
+	Room      RoomClass   `json:"Room"`
+}
+
 type GroupSchedule struct {
-	Times []TimeClasses `json:"Times"`
-	Data  []struct {
-		Day       int         `json:"Day"`
-		DayNumber int         `json:"DayNumber"`
-		Time      TimeClasses `json:"Time"`
-		Class     ClassData   `json:"Class"`
-		Group     GroupData   `json:"Group"`
-		Room      RoomClass   `json:"Room"`
-	} `json:"Data"`
-	Semestr string `json:"Semestr"`
+	Times   []TimeClasses `json:"Times"`
+	Data    []DayData     `json:"Data"`
+	Semestr string        `json:"Semestr"`
 }
 
 type fileTransferData struct {

@@ -78,6 +78,7 @@ func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
 }
 
 func (b *TelegramBot) handleTodayCommand(message *tgbotapi.Message) error {
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "ПИН-44")
 
 	isAuth, msg, err := b.isUserAuth(message)
 	if err != nil {
@@ -86,7 +87,23 @@ func (b *TelegramBot) handleTodayCommand(message *tgbotapi.Message) error {
 		return b.sendResponseMsg(message, msg)
 	}
 
-	return nil
+	weekType := b.TimeInfo.GetCurrentWeekType().WeekTypeNumber
+	_, dayNumber := b.TimeInfo.GetTodayDayNumber()
+
+	_, groupRus, isValidGroup := user.ValidGroup(user.Group)
+
+	if !isValidGroup {
+		log.Println("Invalid group name")
+		return b.sendResponseMsg(message, "Что-то не так с группой")
+	}
+
+	_todaySchedule := b.UniversityData.GetClassesToday(groupRus, dayNumber, weekType)
+
+	if _todaySchedule == "" {
+		_todaySchedule = "Сегодня пар нет"
+	}
+
+	return b.sendResponseMsg(message, _todaySchedule)
 }
 
 func (b *TelegramBot) handleTomorrowCommand(message *tgbotapi.Message) error {
@@ -160,7 +177,8 @@ func (b *TelegramBot) handleAuthCommand(message *tgbotapi.Message) error {
 
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
 
-	if !user.ValidGroup(message.CommandArguments()) {
+	_, _, isGroupValid := user.ValidGroup(message.CommandArguments())
+	if !isGroupValid {
 		log.Println(fmt.Println("Invalid group value : %s", message.CommandArguments()))
 		return b.sendResponseMsg(message, "Группы не существует")
 	}

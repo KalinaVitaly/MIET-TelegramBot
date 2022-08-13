@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
 type UserModel struct {
@@ -27,12 +28,12 @@ func (u *UserModel) SetGroup(group string) {
 	u.Group = group
 }
 
-func (u *UserModel) ValidGroup(group string) bool {
-	for _, _group := range groupsList {
-		log.Println(fmt.Sprintln("Groups : %s : %s", _group, group))
-		if _group == group {
-			return true
+func (u *UserModel) ValidGroup(_group string) (string, string, bool) {
+	for groupEn, groupRus := range groupsList {
+		log.Println(fmt.Sprintln("Groups : %s : %s", _group, groupEn))
+		if groupEn == strings.ToUpper(_group) || groupRus == strings.ToUpper(_group) {
+			return groupEn, groupRus, true
 		}
 	}
-	return false
+	return "", "", false
 }

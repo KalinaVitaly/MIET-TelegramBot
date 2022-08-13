@@ -32,6 +32,7 @@ func CreateTelegramBot(configData *telegramserver.Config, resourcesPath string) 
 		log.Println("Error read resources files ", err.Error())
 		return nil, err
 	}
+	fmt.Println("Example :", universityData.GetClassesToday("ПИН-44", 6, 1))
 
 	timeInfo := timeapi.CreateTimeInformation()
 
