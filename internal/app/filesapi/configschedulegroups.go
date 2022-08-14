@@ -55,7 +55,17 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 		nil
 }
 
-func (s *ScheduleUniversity) GetClassesToday(group string, dayNumber, weekType int) string {
+func (s *ScheduleUniversity) GetClassesCurrentWeek(group string, weekType int) string {
+	var weekSchedule string
+
+	for i := 0; i < 7; i++ {
+		weekSchedule += s.GetClassesInSelectedDay(group, i, weekType) + "\n"
+	}
+
+	return weekSchedule
+}
+
+func (s *ScheduleUniversity) GetClassesInSelectedDay(group string, dayNumber, weekType int) string {
 	var todaySchedule string
 
 	for _, value := range s.GroupsSchedule[group].Data {
