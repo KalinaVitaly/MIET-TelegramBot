@@ -184,6 +184,7 @@ func (b *TelegramBot) handleWeekScheduleCommand(message *tgbotapi.Message) error
 }
 
 func (b *TelegramBot) handleWeekScheduleShortCommand(message *tgbotapi.Message) error {
+	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
 
 	isAuth, msg, err := b.isUserAuth(message)
 	if err != nil {
@@ -192,7 +193,24 @@ func (b *TelegramBot) handleWeekScheduleShortCommand(message *tgbotapi.Message) 
 		return b.sendResponseMsg(message, msg)
 	}
 
-	return nil
+	group, err := b.DataBase.User().Group(user)
+
+	if err != nil {
+		log.Println("Error get user group")
+		return b.sendResponseMsg(message, "Что-то пошло не так при загрузке данных...")
+	}
+
+	_, groupRus, isValidGroup := user.ValidGroup(group)
+
+	if !isValidGroup {
+		log.Println("Invalid group name")
+		return b.sendResponseMsg(message, "Что-то не так с группой...")
+	}
+
+	weekInfo := b.TimeInfo.GetCurrentWeekType()
+	weekSchedule := b.UniversityData.GetShortClassesCurrentWeek(groupRus, weekInfo.WeekTypeNumber)
+
+	return b.sendResponseMsg(message, weekSchedule)
 }
 
 func (b *TelegramBot) handleWeekCommand(message *tgbotapi.Message) error {

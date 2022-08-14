@@ -65,6 +65,31 @@ func (s *ScheduleUniversity) GetClassesCurrentWeek(group string, weekType int) s
 	return weekSchedule
 }
 
+func (s *ScheduleUniversity) GetShortClassesCurrentWeek(group string, weekType int) string {
+	var weekSchedule string
+
+	for i := 0; i < 7; i++ {
+		weekSchedule += s.getShortClassesInSelectedDay(group, i, weekType) + "\n"
+	}
+
+	return weekSchedule
+}
+
+func (s *ScheduleUniversity) getShortClassesInSelectedDay(group string, dayNumber, weekType int) string {
+	var todaySchedule string
+
+	for _, value := range s.GroupsSchedule[group].Data {
+		if value.Day == dayNumber && value.DayNumber == weekType {
+			todaySchedule += value.Time.TimeFrom + "\n"
+			todaySchedule += value.Class.Name + "\n"
+			todaySchedule += "Кабинет : " + value.Room.Name + "\n\n"
+
+			continue
+		}
+	}
+	return todaySchedule
+}
+
 func (s *ScheduleUniversity) GetClassesInSelectedDay(group string, dayNumber, weekType int) string {
 	var todaySchedule string
 
