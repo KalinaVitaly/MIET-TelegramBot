@@ -1,6 +1,7 @@
 package filesapi
 
 import (
+	"MIET-TelegramBot/internal/app/tools"
 	"fmt"
 	"log"
 	"strings"
@@ -31,22 +32,6 @@ func CreateScheduleUniversity(dirPath string) (*ScheduleUniversity, error) {
 		log.Println(groupSchedule[i].Data[0].Group.Name)
 		groupScheduleMap[groupSchedule[i].Data[0].Group.Name] = groupSchedule[i]
 	}
-	// Day       int         `json:"Day"`
-	// DayNumber int         `json:"DayNumber"`
-	// Time      TimeClasses `json:"Time"`
-	// Class     ClassData   `json:"Class"`
-	// Group     GroupData   `json:"Group"`
-	// Room      RoomClass   `json:"Room"`
-
-	for _, value := range groupScheduleMap["ПИН-44"].Data {
-		fmt.Println("************************************************************")
-		fmt.Println("Day : ", value.Day)
-		fmt.Println("Day number  : ", value.DayNumber)
-		fmt.Println("Time  : ", value.Time)
-		fmt.Println("Class  : ", value.Class)
-		fmt.Println("Group   : ", value.Group)
-		fmt.Println("Room  : ", value.Room)
-	}
 
 	return &ScheduleUniversity{
 			ClassTime:      classTime,
@@ -65,29 +50,51 @@ func (s *ScheduleUniversity) GetClassesCurrentWeek(group string, weekType int) s
 	return weekSchedule
 }
 
-func (s *ScheduleUniversity) GetShortClassesCurrentWeek(group string, weekType int) string {
+func (s *ScheduleUniversity) GetShortClassesCurrentWeek(group string, weekType int) (string, error) {
 	var weekSchedule string
 
 	for i := 0; i < 7; i++ {
-		weekSchedule += s.getShortClassesInSelectedDay(group, i, weekType) + "\n"
+		dailySchedule, err := s.getShortClassesInSelectedDay(group, i, weekType)
+		if err != nil {
+			return "", err
+		}
+		weekSchedule += fmt.Sprintln(dailySchedule)
 	}
 
-	return weekSchedule
+	return weekSchedule, nil
 }
 
-func (s *ScheduleUniversity) getShortClassesInSelectedDay(group string, dayNumber, weekType int) string {
+func (s *ScheduleUniversity) getShortClassesInSelectedDay(group string, dayNumber, weekType int) (string, error) {
 	var todaySchedule string
 
 	for _, value := range s.GroupsSchedule[group].Data {
 		if value.Day == dayNumber && value.DayNumber == weekType {
-			todaySchedule += value.Time.TimeFrom + "\n"
-			todaySchedule += value.Class.Name + "\n"
-			todaySchedule += "Кабинет : " + value.Room.Name + "\n\n"
+
+			timeFrom, err := tools.ConvertStringToTime(value.Time.TimeFrom)
+
+			if err != nil {
+				log.Println("Error convert string to time")
+				return "", err
+			}
+
+			timeTo, err := tools.ConvertStringToTime(value.Time.TimeTo)
+
+			if err != nil {
+				log.Println("Error convert string to time")
+				return "", err
+			}
+
+			hoursFrom, minutesFrom, secondsFrom := timeFrom.Clock()
+			hoursTo, minutesTo, secondsTo := timeTo.Clock()
+
+			todaySchedule += fmt.Sprintln(fmt.Sprintf("%.2d:%.2d:%.2d  %.2d:%.2d:%.2d", hoursFrom, minutesFrom, secondsFrom, hoursTo, minutesTo, secondsTo))
+			todaySchedule += fmt.Sprintln(value.Class.Name)
+			todaySchedule += fmt.Sprintln("Кабинет : " + value.Room.Name)
 
 			continue
 		}
 	}
-	return todaySchedule
+	return todaySchedule, nil
 }
 
 func (s *ScheduleUniversity) GetClassesInSelectedDay(group string, dayNumber, weekType int) string {

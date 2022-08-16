@@ -204,11 +204,16 @@ func (b *TelegramBot) handleWeekScheduleShortCommand(message *tgbotapi.Message) 
 
 	if !isValidGroup {
 		log.Println("Invalid group name")
-		return b.sendResponseMsg(message, "Что-то не так с группой...")
+		return b.sendResponseMsg(message, "Что-то пошло не так при загрузке данных...")
 	}
 
 	weekInfo := b.TimeInfo.GetCurrentWeekType()
-	weekSchedule := b.UniversityData.GetShortClassesCurrentWeek(groupRus, weekInfo.WeekTypeNumber)
+	weekSchedule, err := b.UniversityData.GetShortClassesCurrentWeek(groupRus, weekInfo.WeekTypeNumber)
+
+	if err != nil {
+		log.Println("Error get short current week classes")
+		return b.sendResponseMsg(message, "Что-то пошло не так при загрузке данных...")
+	}
 
 	return b.sendResponseMsg(message, weekSchedule)
 }

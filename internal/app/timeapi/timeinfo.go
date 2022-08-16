@@ -2,6 +2,7 @@ package timeapi
 
 import (
 	"MIET-TelegramBot/internal/app/filesapi"
+	"MIET-TelegramBot/internal/app/tools"
 	"fmt"
 	"log"
 	"time"
@@ -78,13 +79,13 @@ func (timer *TimeInformation) IdentifyCurrentPair(timeClass map[int8]filesapi.Ti
 	}
 
 	for i := 0; i < len(timeClass); i++ {
-		timeFrom, err := convertStringToTime(timeClass[int8(i)].TimeFrom)
+		timeFrom, err := tools.ConvertStringToTime(timeClass[int8(i)].TimeFrom)
 		if err != nil {
 			log.Println(fmt.Sprint("IdentifyCurrentPair Error : convert time from string to date format failed %s", err.Error()))
 			return "", err
 		}
 
-		timeTo, err := convertStringToTime(timeClass[int8(i)].TimeTo)
+		timeTo, err := tools.ConvertStringToTime(timeClass[int8(i)].TimeTo)
 
 		if err != nil {
 			log.Println(fmt.Sprint("IdentifyCurrentPair Error : convert time from string to date format failed %s", err.Error()))
@@ -102,15 +103,4 @@ func (timer *TimeInformation) IdentifyCurrentPair(timeClass map[int8]filesapi.Ti
 	}
 
 	return "Сейчас пар нет", nil
-}
-
-func convertStringToTime(timeStr string) (time.Time, error) {
-	timeT, err := time.Parse(time.RFC3339, timeStr+"Z")
-
-	if err != nil {
-		log.Println(fmt.Sprintf("Error convert string time to time type %s %s", err.Error(), timeStr))
-		return timeT, err
-	}
-
-	return timeT, nil
 }
