@@ -104,7 +104,13 @@ func (b *TelegramBot) handleTodayCommand(message *tgbotapi.Message) error {
 		return b.sendResponseMsg(message, "Что-то не так с группой...")
 	}
 
-	_todaySchedule := b.UniversityData.GetClassesInSelectedDay(groupRus, dayNumber, weekType)
+	_todaySchedule, err := b.UniversityData.GetClassesInSelectedDay(groupRus, dayNumber, weekType)
+
+	fmt.Println("Day number ", dayNumber)
+	if err != nil {
+		log.Panicln(fmt.Sprintf("Error get classes in selected day %s", err.Error()))
+		return b.sendResponseMsg(message, "Что-то пошло не так...")
+	}
 
 	if _todaySchedule == "" {
 		_todaySchedule = "Сегодня пар нет"
@@ -139,7 +145,12 @@ func (b *TelegramBot) handleTomorrowCommand(message *tgbotapi.Message) error {
 
 	_, dayNumber, _, weekType := b.TimeInfo.GetTomorrowDayNumberAndWeekType()
 
-	_todaySchedule := b.UniversityData.GetClassesInSelectedDay(groupRus, dayNumber, weekType)
+	_todaySchedule, err := b.UniversityData.GetClassesInSelectedDay(groupRus, dayNumber, weekType)
+
+	if err != nil {
+		log.Panicln(fmt.Sprintf("Error get classes in selected day %s", err.Error()))
+		return b.sendResponseMsg(message, "Что-то пошло не так...")
+	}
 
 	if _todaySchedule == "" {
 		_todaySchedule = "Завтра пар нет"

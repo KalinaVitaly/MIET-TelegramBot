@@ -97,12 +97,29 @@ func (s *ScheduleUniversity) getShortClassesInSelectedDay(group string, dayNumbe
 	return todaySchedule, nil
 }
 
-func (s *ScheduleUniversity) GetClassesInSelectedDay(group string, dayNumber, weekType int) string {
+func (s *ScheduleUniversity) GetClassesInSelectedDay(group string, dayNumber, weekType int) (string, error) {
 	var todaySchedule string
 
 	for _, value := range s.GroupsSchedule[group].Data {
 		if value.Day == dayNumber && value.DayNumber == weekType {
-			todaySchedule += value.Time.TimeFrom + "\n"
+			timeFrom, err := tools.ConvertStringToTime(value.Time.TimeFrom)
+
+			if err != nil {
+				log.Println("Error convert string to time")
+				return "", err
+			}
+
+			timeTo, err := tools.ConvertStringToTime(value.Time.TimeTo)
+
+			if err != nil {
+				log.Println("Error convert string to time")
+				return "", err
+			}
+
+			hoursFrom, minutesFrom, secondsFrom := timeFrom.Clock()
+			hoursTo, minutesTo, secondsTo := timeTo.Clock()
+
+			todaySchedule += fmt.Sprintln(fmt.Sprintf("%.2d:%.2d:%.2d  %.2d:%.2d:%.2d", hoursFrom, minutesFrom, secondsFrom, hoursTo, minutesTo, secondsTo))
 			todaySchedule += value.Class.Name + "\n"
 			todaySchedule += value.Class.TeacherFull + "\n"
 			todaySchedule += value.Class.Form + "\n"
@@ -111,7 +128,7 @@ func (s *ScheduleUniversity) GetClassesInSelectedDay(group string, dayNumber, we
 			continue
 		}
 	}
-	return todaySchedule
+	return todaySchedule, nil
 }
 
 func (scheduleGroups *ScheduleUniversity) ClassTimeToString() (result string) {

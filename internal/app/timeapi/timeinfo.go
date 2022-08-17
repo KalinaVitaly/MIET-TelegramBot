@@ -40,14 +40,21 @@ func (timer *TimeInformation) UpdateWeekType() {
 }
 
 func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
+	// Sunday Weekday = iota
+	// Monday
+	// Tuesday
+	// Wednesday
+	// Thursday
+	// Friday
+	// Saturday
 	data := time.Now().Weekday()
-	return data.String(), (int(data) + 6) % 7
+	return data.String(), int(data)
 }
 
 func (timer *TimeInformation) GetTomorrowDayNumberAndWeekType() (string, int, string, int) {
 	dayData := time.Now().Add(24 * time.Hour).Weekday()
 
-	tomorrowNumber := (int(dayData) + 6) % 7
+	tomorrowNumber := int(dayData)
 	tomorrowString := dayData.String()
 
 	timer.WeekInfo.mutex.RLock()
