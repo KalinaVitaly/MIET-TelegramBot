@@ -44,7 +44,7 @@ func (s *ScheduleUniversity) GetClassesCurrentWeek(group string, weekType int) s
 	var weekSchedule string
 
 	for i := 0; i < 7; i++ {
-		weekSchedule += s.GetClassesInSelectedDay(group, i, weekType) + "\n"
+		weekSchedule += fmt.Sprintln(s.GetClassesInSelectedDay(group, i, weekType))
 	}
 
 	return weekSchedule
