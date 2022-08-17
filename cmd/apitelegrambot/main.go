@@ -24,7 +24,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	bot, err := telegrambotapi.CreateTelegramBot(config.Token, config.ResourcesPath)
+	bot, err := telegrambotapi.CreateTelegramBot(config, config.ResourcesPath)
 
 	if err != nil {
 		log.Fatal("Create telegram bot failed")
