@@ -14,78 +14,58 @@ func (b *TelegramBot) handlersCommands(message *tgbotapi.Message) error {
 	switch message.Command() {
 	//add error handle
 	case "now":
-		return b.handleNowCommand(message)
+		b.middlewareHandler(message, b.handleNowCommand)
 	case "today":
-		return b.handleTodayCommand(message)
+		b.middlewareHandler(message, b.handleTodayCommand)
 	case "tomorrow":
-		return b.handleTomorrowCommand(message)
+		b.middlewareHandler(message, b.handleTomorrowCommand)
 	case "teacher_all":
-		return b.handleTeacherAllCommand(message)
+		b.middlewareHandler(message, b.handleTeacherAllCommand)
 	case "weekschedule":
-		return b.handleWeekScheduleCommand(message)
+		b.middlewareHandler(message, b.handleWeekScheduleCommand)
 	case "weekschedule_short":
-		return b.handleWeekScheduleShortCommand(message)
+		b.middlewareHandler(message, b.handleWeekScheduleShortCommand)
 	case "week":
-		return b.handleWeekCommand(message)
+		b.middlewareHandler(message, b.handleWeekCommand)
 	case "group":
-		return b.handleGroupCommand(message)
+		b.middlewareHandler(message, b.handleGroupCommand)
 	case "auth":
-		return b.handleAuthCommand(message)
+		b.middlewareHandler(message, b.handleAuthCommand)
 	case "auth_teacher":
-		return b.handleAuthTeacherCommand(message)
+		b.middlewareHandler(message, b.handleAuthTeacherCommand)
 	case "deauth":
-		return b.handleDeauthCommand(message)
+		b.middlewareHandler(message, b.handleDeauthCommand)
 	case "deauth_teacher":
-		return b.handleDeauthTeacherCommand(message)
+		b.middlewareHandler(message, b.handleDeauthTeacherCommand)
 	case "subscription":
-		return b.handleSubscribtionCommand(message)
+		b.middlewareHandler(message, b.handleSubscribtionCommand)
 	case "subscribe":
-		return b.handleSubscribeCommand(message)
+		b.middlewareHandler(message, b.handleSubscribeCommand)
 	case "desubscibe":
-		return b.handleDesubscribeCommand(message)
+		b.middlewareHandler(message, b.handleDesubscribeCommand)
 	case "help":
-		return b.handleHelpCommand(message)
+		b.middlewareHandler(message, b.handleHelpCommand)
 	case "class_time":
-		return b.handleClassTimeCommand(message)
+		b.middlewareHandler(message, b.handleClassTimeCommand)
 	default:
 		return b.handleDefaultCommand(message)
 	}
-}
 
-func (b *TelegramBot) isUserAuth(message *tgbotapi.Message) (bool, string, error) {
-	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
-	if isAuth, err := b.DataBase.User().Contains(user); err != nil {
-		log.Println(fmt.Sprint("Error check contains user in db : %s", err.Error()))
-		return false, "Что-то пошло не так...", err
-	} else {
-		if isAuth {
-			log.Println(fmt.Sprint("User %+v contains in db", user))
-			return true, "Пользователь авторизован", nil
-		}
-	}
-
-	return false, "Пользователь не авторизован", nil
+	return nil
 }
 
 func (b *TelegramBot) handleNowCommand(message *tgbotapi.Message) error {
 	msgText, err := b.TimeInfo.IdentifyCurrentPair(b.UniversityData.ClassTime)
 	if err != nil {
-		log.Println(fmt.Sprint("Error now command : %s", err.Error()))
+		log.Println(fmt.Sprintf("Error now command : %s", err.Error()))
 		return nil
 	}
-	log.Println(fmt.Sprintln("Get data now %s", msgText))
+	log.Println(fmt.Sprintf("Get data now %s", msgText))
 	return b.sendResponseMsg(message, msgText)
 }
 
 func (b *TelegramBot) handleTodayCommand(message *tgbotapi.Message) error {
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
-
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
 
 	group, err := b.DataBase.User().Group(user)
 
@@ -121,13 +101,6 @@ func (b *TelegramBot) handleTodayCommand(message *tgbotapi.Message) error {
 
 func (b *TelegramBot) handleTomorrowCommand(message *tgbotapi.Message) error {
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
-
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
 
 	group, err := b.DataBase.User().Group(user)
 
@@ -167,13 +140,6 @@ func (b *TelegramBot) handleTeacherAllCommand(message *tgbotapi.Message) error {
 func (b *TelegramBot) handleWeekScheduleCommand(message *tgbotapi.Message) error {
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
 
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
-
 	group, err := b.DataBase.User().Group(user)
 
 	if err != nil {
@@ -196,13 +162,6 @@ func (b *TelegramBot) handleWeekScheduleCommand(message *tgbotapi.Message) error
 
 func (b *TelegramBot) handleWeekScheduleShortCommand(message *tgbotapi.Message) error {
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
-
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
 
 	group, err := b.DataBase.User().Group(user)
 
@@ -237,18 +196,10 @@ func (b *TelegramBot) handleWeekCommand(message *tgbotapi.Message) error {
 func (b *TelegramBot) handleGroupCommand(message *tgbotapi.Message) error {
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
 
-	isAuth, msg, err := b.isUserAuth(message)
-
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
-
 	group, err := b.DataBase.User().Group(user)
 
 	if err != nil {
-		log.Println(fmt.Sprint("Error get user group %+v from db", user))
+		log.Println(fmt.Sprintf("Error get user group %+v from db", user))
 		return err
 	}
 
@@ -263,26 +214,19 @@ func (b *TelegramBot) handleAuthCommand(message *tgbotapi.Message) error {
 
 	_, _, isGroupValid := user.ValidGroup(message.CommandArguments())
 	if !isGroupValid {
-		log.Println(fmt.Println("Invalid group value : %s", message.CommandArguments()))
+		log.Println(fmt.Sprintf("Invalid group value : %s", message.CommandArguments()))
 		return b.sendResponseMsg(message, "Группы не существует")
 	}
 
 	user.SetGroup(message.CommandArguments())
 
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
-
 	if err := b.DataBase.User().Create(user); err != nil {
-		log.Println(fmt.Sprint("Error create user : %s", err.Error()))
+		log.Println(fmt.Sprintf("Error create user : %s", err.Error()))
 		b.sendResponseMsg(message, "Ошибка при авторизации")
 		return err
 	}
 
-	log.Println(fmt.Sprint("New user auth : %+v", *user))
+	log.Println(fmt.Sprintf("New user auth : %+v", *user))
 	return b.sendResponseMsg(message, "Пользователь успешно авторизован")
 }
 
@@ -293,20 +237,13 @@ func (b *TelegramBot) handleAuthTeacherCommand(message *tgbotapi.Message) error 
 func (b *TelegramBot) handleDeauthCommand(message *tgbotapi.Message) error {
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
 
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
-
 	if err := b.DataBase.User().Delete(user); err != nil {
-		log.Println(fmt.Sprint("Error create user : %s", err.Error()))
+		log.Println(fmt.Sprintf("Error create user : %s", err.Error()))
 		b.sendResponseMsg(message, "Что-то пошло не так ...")
 		return err
 	}
 
-	log.Println(fmt.Sprint("User deauth : %+v", *user))
+	log.Println(fmt.Sprintf("User deauth : %+v", *user))
 	return b.sendResponseMsg(message, "Пользователь деавторизован")
 }
 
@@ -317,36 +254,15 @@ func (b *TelegramBot) handleDeauthTeacherCommand(message *tgbotapi.Message) erro
 
 func (b *TelegramBot) handleSubscribtionCommand(message *tgbotapi.Message) error {
 
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
-
 	return nil
 }
 
 func (b *TelegramBot) handleSubscribeCommand(message *tgbotapi.Message) error {
 
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
-
 	return nil
 }
 
 func (b *TelegramBot) handleDesubscribeCommand(message *tgbotapi.Message) error {
-
-	isAuth, msg, err := b.isUserAuth(message)
-	if err != nil {
-		return b.sendResponseMsg(message, msg)
-	} else if !isAuth {
-		return b.sendResponseMsg(message, msg)
-	}
 
 	return nil
 }

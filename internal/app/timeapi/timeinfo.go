@@ -40,13 +40,6 @@ func (timer *TimeInformation) UpdateWeekType() {
 }
 
 func (timer *TimeInformation) GetTodayDayNumber() (string, int) {
-	// Sunday Weekday = iota
-	// Monday
-	// Tuesday
-	// Wednesday
-	// Thursday
-	// Friday
-	// Saturday
 	data := time.Now().Weekday()
 	return data.String(), int(data)
 }
