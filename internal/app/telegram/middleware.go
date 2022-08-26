@@ -29,7 +29,7 @@ func (b *TelegramBot) middlewareHandler(message *tgbotapi.Message, handler func(
 
 func (b *TelegramBot) isUserAuth(message *tgbotapi.Message) (bool, string, error) {
 	user := models.CreateUserModel(message.From.ID, message.From.FirstName, message.From.LastName, message.From.UserName, "")
-	if isAuth, err := b.DataBase.User().Contains(user); err != nil {
+	if isAuth, err := b.DataBase.User().Contains(user, false); err != nil {
 		log.Println(fmt.Sprintf("Error check contains user in db : %s", err.Error()))
 		return false, "Что-то пошло не так...", err
 	} else {
